@@ -1,4 +1,12 @@
 # UnsupervisedPeakCaller
 
-## example
-python main.py --datapath e9.5_2_regions1000bp_allLabels.txt e9.5_4_regions1000bp_allLabels.txt e9.5_1_regions1000bp_allLabels.txt e9.5_3_regions1000bp_allLabels.txt e9.5_5_regions1000bp_allLabels.txt e9.5_6_regions1000bp_allLabels.txt  --modelpath aeresnet.ckpt
+## Example
+
+Train the model 
+
+`python main.py --datapath rep1.txt rep2.txt --modelpath rcl.ckpt`
+
+Get the predictions
+
+`python rcl_score.py --model rcl.ckpt --dpath rep1.txt rep2.txt`
+
