@@ -9,7 +9,7 @@
 
 # Prerequisites <a name = "prerequisites" />
 
-You will need Python and Pytorch.
+You will need Python, PyTorch Lightning, and PyTorch.
 
 # Preprocessing <a name = "preprocessing" />
 
@@ -23,13 +23,15 @@ Train the model.
 python main.py --datapath rep1.txt rep2.txt --modelpath rcl.ckpt
 ```
 
-Get the predictions. For each replicate, the predicted scores and labels will be written in a file.
+Get the predictions. For each replicate, the predicted scores and labels will be written in a file rcl.txt.
 
 ```
 python rcl_score.py --model rcl.ckpt --dpath rep1.txt rep2.txt
 ```
 
 ## Command-Line Options
+
+Training with **main.py**: 
 
 ```
 Input (required):
@@ -48,3 +50,19 @@ Parameters:
     --temperature Temperature parameter.
         default=0.5
 ```
+
+Obtain predictions with **rcl_score.py**:
+
+```
+Input (required):
+    --dpath
+        Path to each of the preprocessed replicate files.
+    --model
+        Trained model path.
+    --prefix
+        Prefix of the output (default = .).
+```
+
+# How to Cite <a name = "cite" />
+
+# Contact <a name = "contact" />
