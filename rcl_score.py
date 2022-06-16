@@ -64,14 +64,10 @@ def get_conemb(pos, func):
     pos = func(pos_tensor)
     return pos   
 
-def compute_m(dat, model, alllab2):
+def compute_m(dat, rep_class, alllab2):
 
     selected = 0
-    rep_class = []
-    d_count = []
-    for d in dat:
-        d_count.append(np.sum(d, axis = 1).tolist())
-        rep_class.append(get_conemb(d, model))
+    
     m = alllab2[0]
     final_lab = []
     for d in rep_class:
@@ -95,7 +91,6 @@ def compute_m(dat, model, alllab2):
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='metric', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("--id", type=str, default = 1)
     parser.add_argument("--model", type=str)
     parser.add_argument("--dpath", default=[], nargs='*')
     parser.add_argument("--prefix", type=str, '.') # output path
@@ -115,7 +110,7 @@ if __name__ == "__main__":
     if args.psudo:
         for d in dat:
             tmp = np.sum(d, axis = 1)
-            alllab2.append(tmp>30000)
+            alllab2.append(tmp>30000) # this is just a rough threshold for determing peak
     else:
         alllab2 = pickle.load( open('chr' + str(args.id) + "/chip_nbl.p", "rb" ))
 
@@ -123,7 +118,7 @@ if __name__ == "__main__":
     for d in dat:
         rep_class.append(get_conemb(d, classfication))
 
-    final_lab = compute_m(dat, classfication, alllab2)
+    final_lab = compute_m(dat, rep_class, alllab2)
     i = 1
     y_true=alllab2[0]
 
