@@ -69,46 +69,46 @@ else
 fi
 
 #step 1.1: get bga genomecov of the data
-#for i in $chrList
-#do
-#	samtools view -hb $indir/$mergedBam $i -@ $thread | bedtools genomecov -ibam - -pc -bga | grep -w "^$i" > $outdir/"$i"_"$prefix"_merged-bga.begGraph
-#done
+for i in $chrList
+do
+	samtools view -hb $indir/$mergedBam $i -@ $thread | bedtools genomecov -ibam - -pc -bga | grep -w "^$i" > $outdir/"$i"_"$prefix"_merged-bga.begGraph
+done
 
-#for i in $indivBam
-#do	
-#	o=`echo $i | sed 's/.bam//g'`
-#	bedtools genomecov -ibam "$indir"/"$i" -pc -bga > "$outdir"/"$prefix"_"$o"-bga.begGraph
-#done
+for i in $indivBam
+do	
+	o=`echo $i | sed 's/.bam//g'`
+	bedtools genomecov -ibam "$indir"/"$i" -pc -bga > "$outdir"/"$prefix"_"$o"-bga.begGraph
+done
 
 #step 1.2: get counts based on the cutoff
-#if [[ $cutoff == "median" ]]
-#then
-#  for i in $indivBam
-#	do
-#        	o=`echo $i | sed 's/.bam//g'`
-#		bash "$pdir"/getMedian.bash "$chrList" "$outdir"/"$prefix"_"$o"-bga.begGraph "$outdir"/"$prefix"_median.txt
-#	done
+if [[ $cutoff == "median" ]]
+then
+  for i in $indivBam
+	do
+        	o=`echo $i | sed 's/.bam//g'`
+		bash "$pdir"/getMedian.bash "$chrList" "$outdir"/"$prefix"_"$o"-bga.begGraph "$outdir"/"$prefix"_median.txt
+	done
 
-#  for i in $chrList
-#	do
-#		c=`grep -w "^$i" "$outdir"/"$prefix"_median.txt | sort -k2,2n | cut -f 2 | head -n 1`
-#		mkdir $outdir/chr"$i"
-#		echo $indivBam | sed 's/ /\n/g' | parallel "bash \"$pdir\"/getAboveThreshold.bash \"$indir\"/{} \"$i\" \"$c\" \"$outdir\"/chr\"$i\"/\"$i\"_{}-temp.txt \"$thread\""
-#	done
-#else
-#  c="$cutoff"
-#  for i in $chrList
-#        do
-#                mkdir $outdir/chr"$i"
-#                echo $indivBam | sed 's/ /\n/g' | parallel "bash \"$pdir\"/getAboveThreshold.bash \"$indir\"/{} \"$i\" \"$c\" \"$outdir\"/chr\"$i\"/\"$i\"_{}-temp.txt \"$thread\""
-#        done
-#fi
+  for i in $chrList
+	do
+		c=`grep -w "^$i" "$outdir"/"$prefix"_median.txt | sort -k2,2n | cut -f 2 | head -n 1`
+		mkdir $outdir/chr"$i"
+		echo $indivBam | sed 's/ /\n/g' | parallel "bash \"$pdir\"/getAboveThreshold.bash \"$indir\"/{} \"$i\" \"$c\" \"$outdir\"/chr\"$i\"/\"$i\"_{}-temp.txt \"$thread\""
+	done
+else
+  c="$cutoff"
+  for i in $chrList
+        do
+                mkdir $outdir/chr"$i"
+                echo $indivBam | sed 's/ /\n/g' | parallel "bash \"$pdir\"/getAboveThreshold.bash \"$indir\"/{} \"$i\" \"$c\" \"$outdir\"/chr\"$i\"/\"$i\"_{}-temp.txt \"$thread\""
+        done
+fi
 
 #step 2: get positions that pass the threshold in every replicate
-#for i in $chrList
-#do
-#bedops --intersect "$outdir"/chr"$i"/"$i"_* | bedtools merge -d 90 -i - | awk '{if ($3-$2 >= 100) {print}}' | awk '{$(NF+1)="segment"NR}1' | sed 's/ /\t/g' | bedtools intersect -wa -wb -a - -b "$outdir"/"$i"_"$prefix"_merged-bga.begGraph > "$outdir"/chr"$i"/temp"$i".txt
-#done
+for i in $chrList
+do
+bedops --intersect "$outdir"/chr"$i"/"$i"_* | bedtools merge -d 90 -i - | awk '{if ($3-$2 >= 100) {print}}' | awk '{$(NF+1)="segment"NR}1' | sed 's/ /\t/g' | bedtools intersect -wa -wb -a - -b "$outdir"/"$i"_"$prefix"_merged-bga.begGraph > "$outdir"/chr"$i"/temp"$i".txt
+done
 
 #step 3: get $inputLn bp regions
 seq 1 4 | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
