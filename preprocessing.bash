@@ -18,7 +18,7 @@ helpFunction()
    echo -e "\t-p Absolute directory of where the program is installed at."
    echo -e "\t-i Absolute directory of input files."
    echo -e "\t-o Absolute directory of output files."
-   echo -e "\t-g Genome that the data is aligned to. Currently support mm10 (Ensembl) or hg38 (Ensembl)."
+   echo -e "\t-g Genome that the data is aligned to. Currently support mm10 (Ensembl), hg38 (Ensembl), danRer11 (Ensembl)."
    echo -e "\t-c Cutoff for prefiltering. Either \"median\" or specific number."
    echo -e "\t-m Bam files merged from individual replicates. Only used for preprocessing purpose, not for calling peaks. Must be sorted."
    echo -e "\t-b Individual bam files of every replicates. Must be sorted."
@@ -64,8 +64,11 @@ then
 elif [[ $genome == "mm" ]]
 then
   chrList=`echo {1..19} X Y`
+elif [[ $genoe == "danRer" ]]
+then
+  chrList=`echo {1..25} X Y`
 else
-  echo "Only human and mouse genome are supported for now."
+  echo "Only zebrafish, human and mouse genome are supported for now."
 fi
 
 #step 1.1: get bga genomecov of the data
@@ -123,6 +126,14 @@ then
   seq 20 22 | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
 fi
 
+if [[ $genome == "danRer" ]]
+then
+  seq 20 22 | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
+  seq 23 25 | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
+fi
+
+
+
 #step 3.1: remove blacklist
 if [[ $genome == "hg" ]]
 then
@@ -133,13 +144,21 @@ then
   echo "Blacklist regions are Ensembl genome. This will not work if the genome used for alignment is from UCSC."
   bl=""$pdir"/mm10-blacklist.v2.ensembl.bed"
 else
-  echo "Only human and mouse genome are supported for now. Blacklist regions are Ensembl genome. This will not work if the genome used for alignment is from UCSC."
+  echo "Only human and mouse genome blacklists are supported for now. Blacklist regions are Ensembl genome. This will not work if the genome used for alignment is from UCSC. If not mouse or human, will skip removing blacklist regions."
 fi
 
-for i in $chrList
-do
-tail -n +2 "$outdir"/chr"$i"/"$i"regions.txt | sed 's/chr//g' | bedtools intersect -v -a - -b "$bl" > "$outdir"/chr"$i"/"$i"regions2.txt
-done
+if [[ $genome == "hg" ]] | [[ $genome == "mm" ]]
+then
+	for i in $chrList
+	do
+		tail -n +2 "$outdir"/chr"$i"/"$i"regions.txt | sed 's/chr//g' | bedtools intersect -v -a - -b "$bl" > "$outdir"/chr"$i"/"$i"regions2.txt
+	done
+else
+        for i in $chrList
+        do
+                tail -n +2 "$outdir"/chr"$i"/"$i"regions.txt | sed 's/chr//g' > "$outdir"/chr"$i"/"$i"regions2.txt
+        done
+fi
 
 
 #step 4: get counts
