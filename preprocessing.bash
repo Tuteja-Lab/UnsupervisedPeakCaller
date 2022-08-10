@@ -58,18 +58,7 @@ fi
 
 #step 1 - get necessary count files
 #step 1.0: define chromosome numbers
-if [[ $genome == "hg" ]]
-then
-  chrList=`echo {1..22} X Y`
-elif [[ $genome == "mm" ]]
-then
-  chrList=`echo {1..19} X Y`
-elif [[ $genoe == "danRer" ]]
-then
-  chrList=`echo {1..25} X Y`
-else
-  echo "Only zebrafish, human and mouse genome are supported for now."
-fi
+chrList=`samtools view -H "$indir"/"$mergedBam" | grep "SN:" | cut -f 2 | sed 's/SN://g'`
 
 #step 1.1: get bga genomecov of the data
 for i in $chrList
@@ -114,24 +103,22 @@ bedops --intersect "$outdir"/chr"$i"/"$i"_* | bedtools merge -d 90 -i - | awk '{
 done
 
 #step 3: get $inputLn bp regions
-seq 1 4 | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
-seq 5 8 | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
-seq 9 12 | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
-seq 13 16 | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
-seq 17 19 | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
-echo X Y | sed 's/ /\n/g' | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
+arr=($chrList)
+m=${#arr[@]}
+for((n=0;n<${#arr[@]};n++)); do
+        if (( $(($n % 3 )) == 0 & $(($n < ($m-2) )))); then
+                # Run every 3 entries
+                echo ${arr[n]} ${arr[n+1]} ${arr[n+2]} | sed 's/ /\n/g' | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
+        fi
+done
 
-if [[ $genome == "hg" ]]
+if [[ $(($m % 3 )) == 1 ]]
 then
-  seq 20 22 | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
-fi
-
-if [[ $genome == "danRer" ]]
+	echo ${arr[$m-1]} | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
+elif [[ $(($m % 3 )) == 2 ]]
 then
-  seq 20 22 | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
-  seq 23 25 | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
+	echo ${arr[$m-2]} ${arr[$m-1]} | sed 's/ /\n/g' | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
 fi
-
 
 
 #step 3.1: remove blacklist
