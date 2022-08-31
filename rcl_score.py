@@ -65,9 +65,7 @@ def get_conemb(pos, func):
     return pos   
 
 def compute_m(dat, rep_class, alllab2):
-
     selected = 0
-    
     m = alllab2[0]
     final_lab = []
     for d in rep_class:
@@ -87,6 +85,16 @@ def compute_m(dat, rep_class, alllab2):
 
     return final_lab
 
+def make_region(datapath):
+    df = pd.read_csv(datapath, header = None, sep = "\t", names=["chr", "s", "e", "name", "conut"])
+    a = df.groupby("name", sort=False).s.idxmin()
+    b = df.groupby("name", sort=False).e.idxmax()
+    d = df.loc[a]
+    d['e'] =  df.loc[b]['e'].values
+    d = d[d.columns[1:4]]
+    d = d.reset_index(drop=True)
+    return d
+
 
 if __name__ == "__main__":
     
@@ -103,8 +111,10 @@ if __name__ == "__main__":
     #datapath = ['chr' + str(args.id) + "/" + str(args.id) + ".MCF7_" + str(i) + ".covBga-noBl.txt" for i in range(47, 49)]
     datapath = args.dpath
     dat = []
+    dataf = []
     for i in datapath:
         dat.append(read_data_new(i))
+        dataf.append(make_region(i))
 
     alllab2 = []
     if args.psudo:
@@ -112,7 +122,7 @@ if __name__ == "__main__":
             tmp = np.sum(d, axis = 1)
             alllab2.append(tmp>30000) # this is just a rough threshold for determing peak
     else:
-        alllab2 = pickle.load( open('chr' + str(args.id) + "/chip_nbl.p", "rb" ))
+        alllab2 = pickle.load(open('chr' + str(args.id) + "/chip_nbl.p", "rb" )) # not applicable 
 
     rep_class = []
     for d in dat:
@@ -122,7 +132,7 @@ if __name__ == "__main__":
     i = 1
     y_true=alllab2[0]
 
-    for p, f in zip(rep_class, final_lab):
+    for p, f, o in zip(rep_class, final_lab, dataf):
         p = p.squeeze(1).detach().cpu().numpy()
         y_scores = p[:, 0]
         precision, recall, thresholds = precision_recall_curve(y_true, y_scores)
@@ -139,6 +149,7 @@ if __name__ == "__main__":
 
         d = {'chr': str(args.id), 'score': y_scores, 'pred': f}
         df = pd.DataFrame(data=d)
+        df = pd.concat([df, o], axis=1)[["chr", "s", "e", "name", "score", "pred"]]
         df.to_csv(str(args.prefix) + '/rcl' + '.' + str(i) + '.score', index=False)
         i += 1
 
