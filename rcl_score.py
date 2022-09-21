@@ -102,6 +102,7 @@ if __name__ == "__main__":
     parser.add_argument("--model", type=str)
     parser.add_argument("--dpath", default=[], nargs='*')
     parser.add_argument("--prefix", type=str) # output path
+    parser.add_argument("--id", type=int)
     parser.add_argument("--psudo", type=int, default = 1)
 
     args = parser.parse_args()
