@@ -25,6 +25,7 @@ helpFunction()
    echo -e "\t-t Number of threads to use."
    echo -e "\t-n File name prefix."
    echo -e "\t-L Length of input segments."
+   #echo -e "\t-s Skip generating base count files."
 
    exit 1 # Exit script after printing help
 }
@@ -43,12 +44,13 @@ do
         t) thread="$OPTARG";;
         n) prefix="$OPTARG";;
         L) inputLn="$OPTARG";;
+	s) skip="$OPTARG";;
         ?) helpFunction ;; # Print helpFunction in case parameter is non-existent
     esac
 done
 
 # Print helpFunction in case parameters are empty
-if [ -z "$pdir" ] || [ -z "$indir" ] || [ -z "$outdir" ] || [ -z "$genome" ]  || [ -z "$cutoff" ]  || [ -z "$mergedBam" ] || [ -z "$indivBam" ] || [ -z "$thread" ] || [ -z "$prefix" ] || [ -z "$inputLn" ]
+if [ -z "$pdir" ] || [ -z "$indir" ] || [ -z "$outdir" ] || [ -z "$genome" ]  || [ -z "$cutoff" ]  || [ -z "$mergedBam" ] || [ -z "$indivBam" ] || [ -z "$thread" ] || [ -z "$prefix" ] || [ -z "$inputLn" ] #|| [ -z "$skip" ]
 then
    echo "Some or all of the parameters are empty";
    helpFunction
@@ -60,6 +62,7 @@ fi
 #step 1.0: define chromosome numbers
 chrList=`samtools view -H "$indir"/"$mergedBam" | grep "SN:" | cut -f 2 | sed 's/SN://g'`
 
+#if [[ $skip == "false"]] || [[ $skip == "FALSE"]]
 #step 1.1: get bga genomecov of the data
 for i in $chrList
 do
@@ -71,6 +74,7 @@ do
 	o=`echo $i | sed 's/.bam//g'`
 	bedtools genomecov -ibam "$indir"/"$i" -pc -bga > "$outdir"/"$prefix"_"$o"-bga.begGraph
 done
+#fi
 
 #step 1.2: get counts based on the cutoff
 if [[ $cutoff == "median" ]]
@@ -134,7 +138,7 @@ else
   echo "Only human and mouse genome blacklists are supported for now. Blacklist regions are Ensembl genome. This will not work if the genome used for alignment is from UCSC. If not mouse or human, will skip removing blacklist regions."
 fi
 
-if [[ $genome == "hg" ]] | [[ $genome == "mm" ]]
+if [[ $genome == "hg" ]] || [[ $genome == "mm" ]]
 then
 	for i in $chrList
 	do
@@ -150,8 +154,23 @@ fi
 
 #step 4: get counts
 indivBam2=`echo $indivBam | sed 's/.bam//g'`
-for i in $chrList
-do
-echo $indivBam2 | sed 's/ /\n/g' | parallel "bedtools intersect -wb -a \"$outdir\"/chr\"$i\"/\"$i\"regions2.txt -b \"$outdir\"/\"$prefix\"_{}-bga.begGraph | cut -f1-4,8 > \"$outdir\"/chr\"$i\"/\"$i\".\"$prefix\"_{}.covBga.txt"
+arr=($indivBam2)
+m=${#arr[@]}
+
+for i in $chrList; do
+for((n=0;n<${#arr[@]};n++)); do
+        if (( $(($n % 3 )) == 0 & $(($n < ($m-2) )))); then
+                # Run every 3 entries
+                echo ${arr[n]} ${arr[n+1]} ${arr[n+2]} | sed 's/ /\n/g' | parallel "bedtools intersect -wb -a \"$outdir\"/chr\"$i\"/\"$i\"regions2.txt -b \"$outdir\"/\"$prefix\"_{}-bga.begGraph | cut -f1-4,8 > \"$outdir\"/chr\"$i\"/\"$i\".\"$prefix\"_{}.covBga.txt"
+        fi
+done
+
+if [[ $(($m % 3 )) == 1 ]]
+then
+        echo ${arr[$m-1]} | parallel "bedtools intersect -wb -a \"$outdir\"/chr\"$i\"/\"$i\"regions2.txt -b \"$outdir\"/\"$prefix\"_{}-bga.begGraph | cut -f1-4,8 > \"$outdir\"/chr\"$i\"/\"$i\".\"$prefix\"_{}.covBga.txt"
+elif [[ $(($m % 3 )) == 2 ]]
+then
+        echo ${arr[$m-2]} ${arr[$m-1]} | sed 's/ /\n/g' | parallel "bedtools intersect -wb -a \"$outdir\"/chr\"$i\"/\"$i\"regions2.txt -b \"$outdir\"/\"$prefix\"_{}-bga.begGraph | cut -f1-4,8 > \"$outdir\"/chr\"$i\"/\"$i\".\"$prefix\"_{}.covBga.txt"
+fi
 done
 
