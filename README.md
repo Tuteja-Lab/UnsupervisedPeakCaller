@@ -45,13 +45,13 @@ Usage: preprocessing.bash -p "program directory" -i "input directory" -o "output
 Train the model.
 
 ```
-python main.py --datapath rep1.txt rep2.txt --modelpath rcl.ckpt
+python main.py --datapath example/chr10/10.test_MCF7_chr10_rep2.covBga.txt example/chr10/10.test_MCF7_chr10_rep1.covBga.txt  --modelpath rcl.ckpt
 ```
 
 Get the predictions. For each replicate, the predicted scores and labels will be written in a file rcl.txt.
 
 ```
-python rcl_score.py --model rcl.ckpt --dpath rep1.txt rep2.txt
+python rcl_score.py --model rcl.ckpt --dpath example/chr10/10.test_MCF7_chr10_rep2.covBga.txt example/chr10/10.test_MCF7_chr10_rep1.covBga.txt  --preprocess_region example/bigInputs.txt --id 10 --prefix .
 ```
 
 ## Command-Line Options
@@ -86,6 +86,10 @@ Input (required):
         Trained model path.
     --prefix
         Prefix of the output (default = .).
+    --preprocess_region
+        Preprocess region obtained from preprocessing step.
+    --id
+        Chromsome id.
 ```
 
 # How to Cite <a name = "cite" />
