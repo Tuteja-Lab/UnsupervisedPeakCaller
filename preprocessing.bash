@@ -174,3 +174,11 @@ then
 fi
 done
 
+#step 5: get big inputs
+echo $chrList | sed 's/ /\n/g' > "$outdir"/chrList.txt
+Rscript --vanilla "$pdir"/bigInputs.R "$outdir"/chrList.txt "$outdir"
+
+#step 5: remove extra files
+rm "$outdir"/*-bga.begGraph
+rm "$outdir"/chr*/*.bam-temp.txt
+rm "$outdir"/chr*/*regions.txt

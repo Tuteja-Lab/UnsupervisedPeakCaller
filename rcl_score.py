@@ -13,6 +13,7 @@ from sklearn.metrics import auc
 import os
 import argparse
 import pandas as pd
+from functools import reduce
 
 class Classify(nn.Module):
     def __init__(self, embeddings_model_path):
@@ -102,8 +103,10 @@ if __name__ == "__main__":
     parser.add_argument("--model", type=str)
     parser.add_argument("--dpath", default=[], nargs='*')
     parser.add_argument("--prefix", type=str) # output path
-    parser.add_argument("--id", type=str)
+    parser.add_argument("--id", type=int, default = 1)
     parser.add_argument("--psudo", type=int, default = 1)
+    parser.add_argument("--preprocess_region", type=str, default = "None")
+    parser.add_argument("--threshold", type=int, default = 30000)
 
     args = parser.parse_args()
 
@@ -121,18 +124,22 @@ if __name__ == "__main__":
     if args.psudo:
         for d in dat:
             tmp = np.sum(d, axis = 1)
-            alllab2.append(tmp>30000) # this is just a rough threshold for determing peak
+            alllab2.append(tmp > args.threshold) # this is just a rough threshold for determing peak, the label might be flipped
     else:
-        alllab2 = pickle.load(open('chr' + str(args.id) + "/chip_nbl.p", "rb" )) # not applicable 
+        alllab2 = pickle.load(open('chr' + str(args.id) + "/chip_nbl.p", "rb" )) # not applicable here
 
     rep_class = []
     for d in dat:
         rep_class.append(get_conemb(d, classfication))
 
     final_lab = compute_m(dat, rep_class, alllab2)
-    i = 1
-    y_true=alllab2[0]
+    y_true = alllab2[0]
 
+    pre_reg = []
+    if args.preprocess_region != "None":
+        pre_reg = pd.read_csv(args.preprocess_region, sep="\t", skiprows = 1, names=["chr", "s", "e", "name"])
+    
+    dicts = []
     for p, f, o in zip(rep_class, final_lab, dataf):
         p = p.squeeze(1).detach().cpu().numpy()
         y_scores = p[:, 0]
@@ -148,11 +155,23 @@ if __name__ == "__main__":
             #print(auc1, recall, precision)
             y_scores = p[:, 0]
 
-        d = {'chr': str(args.id), 'score': y_scores, 'pred': f}
+        d = {'chr': str(args.id), 'score': y_scores}
+        
         df = pd.DataFrame(data=d)
-        df = pd.concat([df, o], axis=1)[["chr", "s", "e", "name", "score", "pred"]]
-        df.to_csv(str(args.prefix) + '/rcl' + '.' + str(i) + '.score', index=False)
-        i += 1
+        df = pd.concat([df, o], axis=1)[["chr", "s", "e", "name", "score"]]
+        dicts.append(df)
+        
+    df = reduce(lambda df1, df2: pd.merge(df1, df2, on = ["chr", "s", "e", "name"]), dicts)    
+    cols = df.columns[~df.columns.isin(["chr", "s", "e", "name"])]
+    df["scores"] = df[cols].mean(axis=1)
+    df = df[["chr", "s", "e", "name", "scores"]]
+    # join with preprocessing regions
+    if args.preprocess_region != "None":
+        df['name'] = df['name'].str.rsplit('_', 1).str.get(0) # notice this, make sure the preprocessing use _ to seperate 
+        df = df.merge(pre_reg, how ='left', on = "name")
+        df.columns = ["chr", "s1", "e1", "name", "score", "chr1", "s", "e"]
+        df = df[["chr", "s", "e", "name", "score", "s1", "e1"]]
+    df.to_csv(str(args.prefix) + '/rcl_' + str(args.id) + '.bed', index = False, sep = "\t", header = None)
 
 
 

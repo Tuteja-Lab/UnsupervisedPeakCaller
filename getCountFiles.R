@@ -20,7 +20,7 @@ if (sub$end[1] - sub$start[1] < inputLength) {
   sub <- sub[,1:4]
   colnames(sub) <- c("chr", "start", "end", "name")
 } else {
-  sub1 <- sub[which(sub$counts >= quantile(sub$counts), 0.95),]
+  sub1 <- sub[which(sub$counts >= quantile(sub$counts, 0.95)),]
   sub1 <- sub1[,c("chr.c", "start.c", "end.c")]
   colnames(sub1) <- c("chr", "start", "end")
 
@@ -59,6 +59,7 @@ colnames(file) <- c("chr", "start", "end", "name", "chr.c", "start.c", "end.c", 
 
 if (length(grep("chr", file$chr[1])) == 0) {
   print("Adding `chr` to chromosome name")
+  file$name <- paste0(file$chr, file$name)
   file$chr <- paste0("chr", file$chr)
   file$chr.c <- paste0("chr", file$chr.c)
 }

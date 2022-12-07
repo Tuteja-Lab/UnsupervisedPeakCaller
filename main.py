@@ -106,17 +106,16 @@ class ContrastLearn(pl.LightningModule):
             loss += self.hparams.beta * self.AEloss(rep, decodedY)
             all_emb.append(embY)
             all_clu.append(cluY)
-            uni += torch.sum(uniform_loss(normalize(embY.squeeze(1))))       
+           # uni += torch.sum(uniform_loss(normalize(embY.squeeze(1))))       
 
         loss /= self.hparams.n_rep
-        print('AE loss ', loss)
         
         orders = [(a, b) for idx, a in enumerate(range(self.hparams.n_rep)) for b in range(self.hparams.n_rep)[idx + 1:]]
         
         for ords in orders:
     #             embXf, _ = self.forward(X_flipped)
     #             embYf, _ = self.forward(Y_flipped)
-            aln += torch.sum(align_loss(normalize(all_emb[ords[1]].squeeze(1)), normalize(all_emb[ords[0]].squeeze(1))))
+            #aln += torch.sum(align_loss(normalize(all_emb[ords[1]].squeeze(1)), normalize(all_emb[ords[0]].squeeze(1))))
             #print(normalize(all_emb[ords[1]].squeeze(1)))
             #print(normalize(all_emb[ords[0]].squeeze(1)))
             loss_instance = self.ins_loss(all_emb[ords[0]], all_emb[ords[1]])
@@ -126,12 +125,12 @@ class ContrastLearn(pl.LightningModule):
 #             loss += loss_instance + loss_cluster + loss_aug1 + loss_aug2
             loss += loss_instance + loss_cluster
     
-        aln /= len(orders)
+        #aln /= len(orders)
         loss /= len(orders)    
         loss_key = f"{step_name}_loss"
         tensorboard_logs = {loss_key: loss}
-        self.log('align', aln/self.hparams.train_size, on_epoch=True, prog_bar=True)
-        self.log('uni', uni/self.hparams.train_size, on_epoch=True, prog_bar=True)
+        #self.log('align', aln/self.hparams.train_size, on_epoch=True, prog_bar=True)
+        #self.log('uni', uni/self.hparams.train_size, on_epoch=True, prog_bar=True)
 
         return { ("loss" if step_name == "train" else loss_key): loss, 'log': tensorboard_logs,
                         "progress_bar": {loss_key: loss}}
@@ -313,7 +312,7 @@ if __name__ == "__main__":
                         class_num=args.n_class,
                         ins_temp=args.temperature,
                         clu_temp=args.temperature,
-                        n_views=2,## this is for pairwise comparison
+                        n_views=2, ## this is for pairwise comparison
                         n_rep = n_rep,
                         first_kernel_size = args.first_kernel_size, 
                         dropout_rate = args.dropout_rate,
@@ -321,7 +320,7 @@ if __name__ == "__main__":
                         smooth = args.smooth,
                         class_weights = class_weights,
                         modelname = args.model,
-                        beta = 1 ## penalty for encoder decoder, lower beta make things worse
+                        beta = 1 ## penalty for encoder decoder, need to tune according to different data
                         )
 
     print("Start training\n")
