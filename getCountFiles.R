@@ -9,43 +9,53 @@ if (length(args)==0) {
   args[2] = "out.txt"
 }
 
-getSegments <- function(s) {
-sub <- file[file$name == s,]
-
-if (sub$end[1] - sub$start[1] < inputLength) {
-  sub <- dplyr::distinct(sub[,1:4])
+#full new
+process3_1 <- function(sub, s) {
+  sub <- dplyr::distinct(sub[,1:3])
   sub$mid <- round((sub$end - sub$start)/2) + sub$start
   sub$start <- sub$mid - inputLength/2
   sub$end <- sub$mid + inputLength/2
-  sub <- sub[,1:4]
+  sub <- sub[,1:3]
+  sub$name <- s
   colnames(sub) <- c("chr", "start", "end", "name")
-} else {
-  sub1 <- sub[which(sub$counts >= quantile(sub$counts, 0.95)),]
-  sub1 <- sub1[,c("chr.c", "start.c", "end.c")]
-  colnames(sub1) <- c("chr", "start", "end")
 
-  if (nrow(sub1) > 1) {
-    sub1.sort   <- bedr.sort.region(sub1)
-    sub1.merge <- bedr.merge.region(sub1.sort, distance = inputLength, verbose = F)
-    sub1.merge$mid <- round((sub1.merge$end - sub1.merge$start)/2) + sub1.merge$start
-    sub1.merge$start <- sub1.merge$mid - inputLength/2
-    sub1.merge$end <- sub1.merge$mid + inputLength/2
-    
-    for (i in 1:nrow(sub1.merge)) {
-        sub1.merge$name[i] <- paste0(s, "_", i)
-    }
-    sub <- sub1.merge[,c("chr", "start", "end", "name")]
+  return(sub)
+}
+
+getSegments <- function(s) {
+  sub <- file[file$name == s,]
+ 
+  if (sub$end[1] - sub$start[1] < inputLength) {
+  	sub <- process3_1(sub, s)
   } else {
-    sub$mid <- round((sub$end - sub$start)/2) + sub$start
-    sub$start <- sub$mid - inputLength/2
-    sub$end <- sub$mid + inputLength/2
-    sub <- sub[,1:4]
-    colnames(sub) <- c("chr", "start", "end", "name")
-  }
+  	sub1 <- sub[which(sub$counts >= quantile(sub$counts, 0.95)),]
+  	sub1c <- sub1
+  	sub1 <- sub1[,c("chr.c", "start.c", "end.c")]
+  	colnames(sub1) <- c("chr", "start", "end")
+  
+  	if (nrow(sub1) > 1) {
+    		sub1.sort   <- bedr.sort.region(sub1)
+    		sub1.merge <- bedr.merge.region(sub1.sort, distance = inputLength, verbose = T)
+    		sub1.merge$mid <- round((sub1.merge$end - sub1.merge$start)/2) + sub1.merge$start
+    		sub1.merge$start <- sub1.merge$mid - inputLength/2
+    		sub1.merge$end <- sub1.merge$mid + inputLength/2
+    
+		for (i in 1:nrow(sub1.merge)) {
+		      sub1.merge$name[i] <- paste0(s, "_", i)
+		}
+  	sub <- sub1.merge[,c("chr", "start", "end", "name")]
+  	} else {
+    		sub$mid <- round((sub$end - sub$start)/2) + sub$start
+    		sub$start <- sub$mid - inputLength/2
+    		sub$end <- sub$mid + inputLength/2
+    		sub <- sub[,1:4]
+    		colnames(sub) <- c("chr", "start", "end", "name")
+  	}
+   }	
+ 
+  return(sub)
 }
 
-return(sub)
-}
 
 
 suppressPackageStartupMessages(library(bedr))

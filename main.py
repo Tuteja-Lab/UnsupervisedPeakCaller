@@ -16,6 +16,8 @@ import pickle
 from conclu import *
 from ios import read_data_new, read_covearge, read_fragment, combine_reps
 
+import warnings
+warnings.filterwarnings("ignore", ".*does not have many workers.*")
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # In[12]:
@@ -229,7 +231,8 @@ class ContrastLearn_lab(pl.LightningModule):
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='train', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--datapath', default=[], nargs='*')
+    parser.add_argument('--datapath', type=str)
+    parser.add_argument('--n_rep', type=int)
     parser.add_argument('--fragpath', default=[], nargs='*')
     parser.add_argument('--modelpath', default='model.ckpt', type=str)
     parser.add_argument('--labpath', default='null', type=str)
@@ -253,10 +256,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     random.seed(args.seed)
-    print("Reading coverage files\n")
-    n_rep = len(args.datapath)
+    print("Reading coverage files")
+    n_rep = args.n_rep
+    datapath = [args.datapath + '/rep' + str(x)  + '.txt'  for x in list(range(1, int(n_rep) + 1))]
     d = []
-    for i in args.datapath:
+    for i in datapath:
         cov = read_data_new(i)
         d.append(cov)
     # test set

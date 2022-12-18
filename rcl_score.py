@@ -30,7 +30,6 @@ class Classify(nn.Module):
             x = res_block(x)
         h = self.instance_projector(x)
         h = h.unsqueeze(1)
-        print(h.size())
         ass = self.clustering(h)    
         return ass
 
@@ -101,7 +100,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='metric', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--model", type=str)
-    parser.add_argument("--dpath", default=[], nargs='*')
+    parser.add_argument("--dpath", type=str)
     parser.add_argument("--prefix", type=str) # output path
     parser.add_argument("--id", type=int, default = 1)
     parser.add_argument("--psudo", type=int, default = 1)
@@ -112,8 +111,8 @@ if __name__ == "__main__":
 
     #classfication = Classify('chr' + str(args.id) + "/" + str(args.model)) ## this is training seperately
     classfication = Classify(str(args.model))    ## train on all (80 or 90 %)
-    #datapath = ['chr' + str(args.id) + "/" + str(args.id) + ".MCF7_" + str(i) + ".covBga-noBl.txt" for i in range(47, 49)]
-    datapath = args.dpath
+    datapath = [args.dpath + '/' + f for f in os.listdir(args.dpath) if f.endswith('covBga.txt')]    
+    print(datapath) 
     dat = []
     dataf = []
     for i in datapath:
