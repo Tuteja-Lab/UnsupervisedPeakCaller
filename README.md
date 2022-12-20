@@ -21,7 +21,17 @@ module load udunits/2.2.24-yldmp4h
 module load gdal/2.4.4-nw2drgf
 module load geos/3.8.1-2m7gav4
 ```
-For the deep learner step, you will need Python, PyTorch Lightning, and PyTorch.
+
+For the deep learner step, **GPU** is needed. Other packages needed are:
+```
+Python (>=3.7.10)
+PyTorch Lightning (>=1.5.1)
+PyTorch (>=1.10.0)
+numpy (>=1.21.5)
+pandas (>=1.3.5)
+argparse (>=1.1)
+sklearn (>=1.0.1)
+```
 
 # Preprocessing <a name = "preprocessing" />
 ```
@@ -42,56 +52,41 @@ Usage: preprocessing.bash -p "program directory" -i "input directory" -o "output
 
 ## Example
 
-Train the model.
+Train the model and obtain the predictions.
 
 ```
-python main.py --datapath example/chr10/10.test_MCF7_chr10_rep2.covBga.txt example/chr10/10.test_MCF7_chr10_rep1.covBga.txt  --modelpath rcl.ckpt
-```
-
-Get the predictions. For each replicate, the predicted scores and labels will be written in a file rcl.txt.
-
-```
-python rcl_score.py --model rcl.ckpt --dpath example/chr10/10.test_MCF7_chr10_rep2.covBga.txt example/chr10/10.test_MCF7_chr10_rep1.covBga.txt  --preprocess_region example/bigInputs.txt --id 10 --prefix .
+bash run_rcl.sh -p example -f "rep1 rep2"
 ```
 
 ## Command-Line Options
 
-Training with **main.py**: 
-
 ```
 Input (required):
-    --datapath 
-        Path to each of the preprocessed replicate files.
-    --modelpath
-        Path to trained model (default = model.ckpt).
+    --p 
+        Path to preprocessing data.
+    --f
+        Name of the replicate file (without suffix), for example rep 1 rep2
 
-Parameters:
-    --epochs  Training epoches.
+Parameters (optional):
+    --e  Training epoches.
         default=25
-    --lr      Convergence rate.
-        default=1e-4
-    --batch_size Batch size.
+    --b Batch size.
         default=256
-    --temperature Temperature parameter.
-        default=0.5
 ```
 
-Obtain predictions with **rcl_score.py**:
+## Output
 
+The trained model is called `rcl.ckpt` and results are stored in `rcl.bed`. The output will have 
+
+*chromosome name, peak start position, peak end position, peak name, peak score, training region start position, training region end position*, for example
 ```
-Input (required):
-    --dpath
-        Path to each of the preprocessed replicate files.
-    --model
-        Trained model path.
-    --prefix
-        Prefix of the output (default = .).
-    --preprocess_region
-        Preprocess region obtained from preprocessing step.
-    --id
-        Chromsome id.
+10      49829   50258   10segment1      0.18526842      49543   50543
+10      73663   74515   10segment2      0.8270205       73589   74589
 ```
 
 # How to Cite <a name = "cite" />
 
 # Contact <a name = "contact" />
+
+Yudi Zhang (yudiz@iastate.edu), Ha Vu (hhvu@iastate.edu)
+
