@@ -46,6 +46,11 @@ argparse (>=1.1)
 sklearn (>=1.0.1)
 ```
 
+# Installation
+```
+git clone https://github.com/Tuteja-Lab/UnsupervisedPeakCaller.git
+```
+
 # Preprocessing <a name = "preprocessing" />
 ```
 Usage: preprocessing.bash -p "program directory" -i "input directory" -o "output directory" -g hg -c 2 -m "merged.bam" -b "indi1.bam indi2.bam" -t 12 -n test -L 1000
