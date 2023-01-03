@@ -17,6 +17,9 @@ R (>= 4.0.2)
 bedops (>= 2.4.35)
 
 R library dplyr (>= 1.0.7)
+R library bedr (>= 1.0.7)
+R library doParallel (>= 1.0.16)
+
 ```
 The current pipeline has been tested on a HPC machine with the following modules loaded:
 ```
