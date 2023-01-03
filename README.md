@@ -8,7 +8,17 @@
 1. [Contact](#contact)
 
 # Prerequisites <a name = "prerequisites" />
-For input preprocessing steps, here are the modules used:
+For input preprocessing steps, this following tools and R libraries are required:
+```
+samtools (>= 1.10)
+bedtools2 (>= 2.27.1)
+parallel (>= 20170322)
+R (>= 4.0.2)
+bedops (>= 2.4.35)
+
+R library dplyr (>= 1.0.7)
+```
+The current pipeline has been tested on a HPC machine with the following modules loaded:
 ```
 module load samtools
 module load bedtools2
