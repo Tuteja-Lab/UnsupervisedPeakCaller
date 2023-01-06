@@ -264,7 +264,7 @@ if __name__ == "__main__":
         cov = read_data_new(i)
         d.append(cov)
     # test set
-    if args.sample is not 'null':
+    if args.sample != 'null':
         selected = np.random.choice(d[0].shape[0], int(d[0].shape[0] * 0.85), replace = False)
         pickle.dump(selected, open(str(args.sample) + ".p", "wb"))
         d = np.array(d)
