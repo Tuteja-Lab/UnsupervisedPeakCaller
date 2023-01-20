@@ -8,7 +8,7 @@
 1. [Contact](#contact)
 
 # Prerequisites <a name = "prerequisites" />
-For input preprocessing steps, this following tools and R libraries are required:
+For input preprocessing steps, the following tools and R libraries are required:
 ```
 samtools (>= 1.10)
 bedtools2 (>= 2.27.1)
