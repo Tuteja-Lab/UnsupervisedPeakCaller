@@ -19,22 +19,7 @@ bedops (>= 2.4.35)
 R library dplyr (>= 1.0.7)
 R library bedr (>= 1.0.7)
 R library doParallel (>= 1.0.16)
-
 ```
-The current pipeline has been tested on a HPC machine with the following modules loaded:
-```
-module load samtools
-module load bedtools2
-module load parallel
-module load bedops/2.4.35-gl7y6z6
-module load gcc/7.3.0-xegsmw4
-module load r/4.0.2-py3-icvulwq
-module load gsl/2.5-fpqcpxf
-module load udunits/2.2.24-yldmp4h
-module load gdal/2.4.4-nw2drgf
-module load geos/3.8.1-2m7gav4
-```
-
 For the deep learner step, **GPU** is needed. Other packages needed are:
 ```
 Python (>=3.7.10)
@@ -64,6 +49,22 @@ Usage: preprocessing.bash -p "program directory" -i "input directory" -o "output
         -t Number of threads to use.
         -n File name prefix.
         -L Length of input segments.
+```
+
+## Example
+```
+module load samtools
+module load bedtools2
+module load parallel
+module load bedops/2.4.35-gl7y6z6
+module load gcc/7.3.0-xegsmw4
+module load r/4.0.2-py3-icvulwq
+module load gsl/2.5-fpqcpxf
+module load udunits/2.2.24-yldmp4h
+module load gdal/2.4.4-nw2drgf
+module load geos/3.8.1-2m7gav4
+
+bash /work/LAS/geetu-lab-collab/UnsupervisedPeakCaller/preprocessing.bash -p "/work/LAS/geetu-lab-collab/UnsupervisedPeakCaller" -i "/work/LAS/geetu-lab-collab/UnsupervisedPeakCaller/example" -o "/work/LAS/geetu-lab-collab/UnsupervisedPeakCaller/example" -g "hg" -c "median" -m "MCF7_chr10_merged.bam" -b "MCF7_chr10_rep1.bam MCF7_chr10_rep2.bam" -t 12 -n "test" -L 1000
 ```
 
 # Peak Calling <a name = "peakcalling" />
@@ -103,6 +104,7 @@ The trained model is called `rcl.ckpt` and results are stored in `rcl.bed`. The 
 ```
 
 # How to Cite <a name = "cite" />
+Preprint https://www.biorxiv.org/content/10.1101/2023.01.07.523108v1
 
 # Contact <a name = "contact" />
 

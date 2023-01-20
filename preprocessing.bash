@@ -1,16 +1,5 @@
 #!/bin/bash
 
-module load samtools
-module load bedtools2
-module load parallel
-module load bedops/2.4.35-gl7y6z6
-module load gcc/7.3.0-xegsmw4
-module load r/4.0.2-py3-icvulwq
-module load gsl/2.5-fpqcpxf
-module load udunits/2.2.24-yldmp4h
-module load gdal/2.4.4-nw2drgf
-module load geos/3.8.1-2m7gav4
-
 helpFunction()
 {
    echo ""
@@ -25,7 +14,6 @@ helpFunction()
    echo -e "\t-t Number of threads to use."
    echo -e "\t-n File name prefix."
    echo -e "\t-L Length of input segments."
-   #echo -e "\t-s Skip generating base count files."
 
    exit 1 # Exit script after printing help
 }
@@ -62,7 +50,7 @@ fi
 #step 1.0: define chromosome numbers
 chrList=`samtools view -H "$indir"/"$mergedBam" | grep "SN:" | cut -f 2 | sed 's/SN://g'`
 
-#if [[ $skip == "false"]] || [[ $skip == "FALSE"]]
+
 #step 1.1: get bga genomecov of the data
 for i in $chrList
 do
