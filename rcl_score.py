@@ -14,7 +14,9 @@ import os
 import argparse
 import pandas as pd
 from functools import reduce
+import warnings
 
+warnings.filterwarnings("ignore")
 class Classify(nn.Module):
     def __init__(self, embeddings_model_path):
         super().__init__()
@@ -102,7 +104,7 @@ if __name__ == "__main__":
     parser.add_argument("--model", type=str)
     parser.add_argument("--dpath", type=str)
     parser.add_argument("--prefix", type=str) # output path
-    parser.add_argument("--id", type=int, default = 1)
+    parser.add_argument("--id", type=str)
     parser.add_argument("--psudo", type=int, default = 1)
     parser.add_argument("--preprocess_region", type=str, default = "None")
     parser.add_argument("--threshold", type=int, default = 30000)
