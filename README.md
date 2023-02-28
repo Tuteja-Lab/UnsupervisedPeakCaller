@@ -45,11 +45,12 @@ Usage: preprocessing.bash -p "program directory" -i "input directory" -o "output
         -g Genome that the data is aligned to. Currently support mm10 (Ensembl) or hg38 (Ensembl).
         -c Cutoff for prefiltering. Either "median" or specific number.
         -m Bam files merged from individual replicates. Only used for preprocessing purpose, not for calling peaks. Must be sorted.
-        -b Individual bam files of every replicates. Must be sorted.
+        -b Individual bam files of every replicate. Must be sorted.
         -t Number of threads to use.
         -n File name prefix.
         -L Length of input segments.
 ```
+At this step, the script assumes your data has been aligned to mouse or human genome, Ensembl assembly.
 
 ## Example
 ```
@@ -84,7 +85,7 @@ Input (required):
     --p 
         Path to preprocessing data.
     --f
-        Name of the replicate file (without suffix), for example rep 1 rep2
+        Names of the individual BAM files (without suffix). For example, if your BAM files are rep1.bam and rep2.bam, use "rep1 rep2"
 
 Parameters (optional):
     --e  Training epoches.
