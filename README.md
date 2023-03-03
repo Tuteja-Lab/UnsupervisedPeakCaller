@@ -44,8 +44,8 @@ Usage: preprocessing.bash -p "program directory" -i "input directory" -o "output
         -o Absolute directory of output files.
         -g Genome that the data is aligned to. Currently support mm10 (Ensembl) or hg38 (Ensembl).
         -c Cutoff for prefiltering. Either "median" or specific number.
-        -m Bam files merged from individual replicates. Only used for preprocessing purpose, not for calling peaks. Must be sorted.
-        -b Individual bam files of every replicate. Must be sorted.
+        -m Bam files merged from individual replicates. Only used for preprocessing purpose, not for calling peaks. Must be indexed and sorted.
+        -b Individual bam files of every replicate. Must be indexed and sorted.
         -t Number of threads to use.
         -n File name prefix.
         -L Length of input segments.
