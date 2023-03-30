@@ -28,7 +28,7 @@ PyTorch (>=1.10.0)
 numpy (>=1.21.5)
 pandas (>=1.3.5)
 argparse (>=1.1)
-sklearn (>=1.0.1)
+scikit-learn (>=1.0.1)
 ```
 
 # Installation
