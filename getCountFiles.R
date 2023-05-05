@@ -89,7 +89,7 @@ for (i in 1:length(result)) {
         new <- rbind(new, result[[i]])
 }
 new <- new[!is.na(new$chr),]
-write.table(format(new, scientific = FALSE), file=args[3], quote = F, sep = "\t", row.names = F)
+write.table(format(new, scientific = FALSE, trim = TRUE), file=args[3], quote = F, sep = "\t", row.names = F)
 } else {
 print("Input has 0 line.")
 }
