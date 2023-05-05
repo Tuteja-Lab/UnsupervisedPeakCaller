@@ -112,8 +112,15 @@ then
 	echo ${arr[$m-2]} ${arr[$m-1]} | sed 's/ /\n/g' | parallel "Rscript --vanilla \"$pdir\"/getCountFiles.R \"$outdir\"/chr{}/temp{}.txt \"$inputLn\" \"$outdir\"/chr{}/{}regions.txt"
 fi
 
+#step 3.1: remove out-of-bounds segments
+for i in $chrList
+do
+	maximumBp=`tail -n 1 "$outdir"/"$i"_"$prefix"_merged-bga.begGraph | awk -F '\t' '{print $3}'` # Get the length of the chromosome
+	# sort removes duplicate lines (even if they aren't adjacent), sed removes negative start positions, awk removes end positions greater than the chromosome length
+	tail -n +2 "$outdir"/chr"$i"/"$i"regions.txt | sort -k2 -nu | sed '/-/d' | awk -F '\t' "\$3<=$maximumBp" > "$outdir"/chr"$i"/"$i"regions1.txt
+done
 
-#step 3.1: remove blacklist
+#step 3.2: remove blacklist
 if [[ $genome == "hg" ]]
 then
   echo "Blacklist regions are Ensembl genome. This will not work if the genome used for alignment is from UCSC."
@@ -130,12 +137,12 @@ if [[ $genome == "hg" ]] || [[ $genome == "mm" ]]
 then
 	for i in $chrList
 	do
-		tail -n +2 "$outdir"/chr"$i"/"$i"regions.txt | sed 's/chr//g' | bedtools intersect -v -a - -b "$bl" > "$outdir"/chr"$i"/"$i"regions2.txt
+		cat "$outdir"/chr"$i"/"$i"regions1.txt | sed 's/chr//g' | bedtools intersect -v -a - -b "$bl" > "$outdir"/chr"$i"/"$i"regions2.txt
 	done
 else
         for i in $chrList
         do
-                tail -n +2 "$outdir"/chr"$i"/"$i"regions.txt | sed 's/chr//g' > "$outdir"/chr"$i"/"$i"regions2.txt
+                cat "$outdir"/chr"$i"/"$i"regions1.txt | sed 's/chr//g' > "$outdir"/chr"$i"/"$i"regions2.txt
         done
 fi
 
@@ -170,3 +177,4 @@ Rscript --vanilla "$pdir"/bigInputs.R "$outdir"/chrList.txt "$outdir"
 rm "$outdir"/*-bga.begGraph
 rm "$outdir"/chr*/*.bam-temp.txt
 rm "$outdir"/chr*/*regions.txt
+rm "$outdir"/chr*/*regions1.txt
