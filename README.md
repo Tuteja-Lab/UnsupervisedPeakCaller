@@ -1,4 +1,4 @@
-# Unsupervised Contrastive PeakCaller
+# Unsupervised Contrastive Peak Caller
 
 # Table of Contents
 1. [Prerequisites](#prerequisites)
@@ -53,6 +53,8 @@ Usage: preprocessing.bash -p "program directory" -i "input directory" -o "output
 At this step, the script assumes your data has been aligned to mouse or human genome, Ensembl assembly.
 
 ## Example
+Download example bam files here https://iastate.box.com/s/9uavg2zsy5w0i7v227ei7yaeea7yktr6
+
 ```
 module load samtools
 module load bedtools2
@@ -105,9 +107,10 @@ The trained model is called `rcl.ckpt` and results are stored in `rcl.bed`. The 
 ```
 
 # How to Cite <a name = "cite" />
-Preprint https://www.biorxiv.org/content/10.1101/2023.01.07.523108v1
+Vu, H. T., Zhang, Y., Tuteja, G., & Dorman, K. S. (2023). Unsupervised contrastive peak caller for ATAC-seq. Genome Research, gr-277677.   
+Link to article: https://genome.cshlp.org/content/33/7/1133.full
 
 # Contact <a name = "contact" />
 
-Yudi Zhang (yudiz@iastate.edu), Ha Vu (hhvu@iastate.edu)
+Ha Vu (hhvu@iastate.edu or vthihong@umich.com), Yudi Zhang (yudiz@iastate.edu)
 
