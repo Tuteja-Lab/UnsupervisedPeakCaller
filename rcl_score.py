@@ -168,7 +168,7 @@ if __name__ == "__main__":
     df = df[["chr", "s", "e", "name", "scores"]]
     # join with preprocessing regions
     if args.preprocess_region != "None":
-        df['name'] = df['name'].str.rsplit('_', 1).str.get(0) # notice this, make sure the preprocessing use _ to seperate 
+        df['name'] = df['name'].str.rsplit(pat='_', n=1).str.get(0) # notice this, make sure the preprocessing use _ to seperate 
         df = df.merge(pre_reg, how ='left', on = "name")
         df.columns = ["chr", "s1", "e1", "name", "score", "chr1", "s", "e"]
         df = df[["chr", "s", "e", "name", "score", "s1", "e1"]]

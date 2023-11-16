@@ -34,8 +34,8 @@ getSegments <- function(s) {
   	colnames(sub1) <- c("chr", "start", "end")
   
   	if (nrow(sub1) > 1) {
-    		sub1.sort   <- bedr.sort.region(sub1)
-    		sub1.merge <- bedr.merge.region(sub1.sort, distance = inputLength, verbose = T)
+    		sub1.sort   <- bedr.sort.region(sub1, check.chr = FALSE)
+    		sub1.merge <- bedr.merge.region(sub1.sort, distance = inputLength, verbose = T, check.chr = FALSE)
     		sub1.merge$mid <- round((sub1.merge$end - sub1.merge$start)/2) + sub1.merge$start
     		sub1.merge$start <- sub1.merge$mid - inputLength/2
     		sub1.merge$end <- sub1.merge$mid + inputLength/2
