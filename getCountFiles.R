@@ -82,7 +82,7 @@ registerDoParallel(cl)
 new <- data.frame(matrix(ncol = 4))
 colnames(new) <- c("chr", "start", "end", "name")
 
-result <- foreach(i=unique(file$name)) %dopar% getSegments(i)
+result <- foreach(i=unique(file$name)) %dopar% {getSegments(i)}
 #save(result, file=args[3])
 
 for (i in 1:length(result)) {

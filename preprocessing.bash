@@ -48,10 +48,12 @@ fi
 
 #step 1 - get necessary count files
 #step 1.0: define chromosome numbers
+echo "Getting chromosomes from mergedBam file..."
 chrList=`samtools view -H "$indir"/"$mergedBam" | grep "SN:" | cut -f 2 | sed 's/SN://g'`
 
 
 #step 1.1: get bga genomecov of the data
+echo "Getting coverage data..."
 for i in $chrList
 do
 	samtools view -hb $indir/$mergedBam $i -@ $thread | bedtools genomecov -ibam - -pc -bga | grep -w "^$i" > $outdir/"$i"_"$prefix"_merged-bga.begGraph
@@ -65,6 +67,7 @@ done
 #fi
 
 #step 1.2: get counts based on the cutoff
+echo "Getting threshold -t..."
 if [[ $cutoff == "median" ]]
 then
   for i in $indivBam
@@ -89,12 +92,14 @@ else
 fi
 
 #step 2: get positions that pass the threshold in every replicate
+echo "Getting bases that pass threshold..."
 for i in $chrList
 do
 bedops --intersect "$outdir"/chr"$i"/"$i"_* | bedtools merge -d 90 -i - | awk '{if ($3-$2 >= 100) {print}}' | awk '{$(NF+1)="segment"NR}1' | sed 's/ /\t/g' | bedtools intersect -wa -wb -a - -b "$outdir"/"$i"_"$prefix"_merged-bga.begGraph > "$outdir"/chr"$i"/temp"$i".txt
 done
 
 #step 3: get $inputLn bp regions
+echo "Getting \${inputLn} bp regions"
 arr=($chrList)
 m=${#arr[@]}
 for((n=0;n<${#arr[@]};n++)); do
@@ -114,6 +119,7 @@ fi
 
 
 #step 3.1: remove blacklist
+echo "Removing blacklist regions..."
 if [[ $genome == "hg" ]]
 then
   echo "Blacklist regions are Ensembl genome. This will not work if the genome used for alignment is from UCSC."
@@ -141,6 +147,7 @@ fi
 
 
 #step 4: get counts
+echo "Getting counts per replicate..."
 indivBam2=`echo $indivBam | sed 's/.bam//g'`
 arr=($indivBam2)
 m=${#arr[@]}
@@ -163,10 +170,12 @@ fi
 done
 
 #step 5: get big inputs
+echo "Getting coordinates of candidates..."
 echo $chrList | sed 's/ /\n/g' > "$outdir"/chrList.txt
 Rscript --vanilla "$pdir"/bigInputs.R "$outdir"/chrList.txt "$outdir"
 
 #step 5: remove extra files
+echo "Cleaning up directory..."
 rm "$outdir"/*-bga.begGraph
 rm "$outdir"/chr*/*.bam-temp.txt
 rm "$outdir"/chr*/*regions.txt
