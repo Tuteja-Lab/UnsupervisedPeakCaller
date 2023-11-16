@@ -34,8 +34,8 @@ getSegments <- function(s) {
   	colnames(sub1) <- c("chr", "start", "end")
   
   	if (nrow(sub1) > 1) {
-    		sub1.sort   <- bedr.sort.region(sub1)
-    		sub1.merge <- bedr.merge.region(sub1.sort, distance = inputLength, verbose = T)
+    		sub1.sort   <- bedr.sort.region(sub1, check.chr = FALSE)
+    		sub1.merge <- bedr.merge.region(sub1.sort, distance = inputLength, verbose = T, check.chr = FALSE)
     		sub1.merge$mid <- round((sub1.merge$end - sub1.merge$start)/2) + sub1.merge$start
     		sub1.merge$start <- sub1.merge$mid - inputLength/2
     		sub1.merge$end <- sub1.merge$mid + inputLength/2
@@ -82,7 +82,7 @@ registerDoParallel(cl)
 new <- data.frame(matrix(ncol = 4))
 colnames(new) <- c("chr", "start", "end", "name")
 
-result <- foreach(i=unique(file$name)) %dopar% getSegments(i)
+result <- foreach(i=unique(file$name)) %dopar% {getSegments(i)}
 #save(result, file=args[3])
 
 for (i in 1:length(result)) {
