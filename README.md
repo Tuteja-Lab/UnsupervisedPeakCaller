@@ -67,7 +67,8 @@ module load udunits/2.2.24-yldmp4h
 module load gdal/2.4.4-nw2drgf
 module load geos/3.8.1-2m7gav4
 
-bash /work/LAS/geetu-lab-collab/UnsupervisedPeakCaller/preprocessing.bash -p "/work/LAS/geetu-lab-collab/UnsupervisedPeakCaller" -i "/work/LAS/geetu-lab-collab/UnsupervisedPeakCaller/example" -o "/work/LAS/geetu-lab-collab/UnsupervisedPeakCaller/example" -g "hg" -c "median" -m "MCF7_chr10_merged.bam" -b "MCF7_chr10_rep1.bam MCF7_chr10_rep2.bam" -t 12 -n "test" -L 1000
+p="/work/LAS/geetu-lab-collab/UnsupervisedPeakCaller"
+bash ${p}/preprocessing.bash -p ${p} -i "/work/LAS/geetu-lab-collab/UnsupervisedPeakCaller/example" -o "/work/LAS/geetu-lab-collab/UnsupervisedPeakCaller/example" -g "hg" -c "median" -m "MCF7_chr10_merged.bam" -b "MCF7_chr10_rep1.bam MCF7_chr10_rep2.bam" -t 12 -n "test" -L 1000
 ```
 
 # Peak Calling <a name = "peakcalling" />
