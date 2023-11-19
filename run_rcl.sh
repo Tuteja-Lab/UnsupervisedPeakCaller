@@ -6,7 +6,7 @@ helpFunction()
 	   echo "Usage: $0 -p \"path to preprocessing data\" -f \"indiv1 indiv2\""
 	   echo -e "\t-p path to preprocessing data."
 	   echo -e "\t-f name of the replicate file (without suffix)"
-	   echo -e "\t-e number of epoch (deafult 25)."
+	   echo -e "\t-e number of epoch (default 25)."
 	   echo -e "\t-b batch size (default 256)."
 	   exit 1 # Exit script after printing help
 }
