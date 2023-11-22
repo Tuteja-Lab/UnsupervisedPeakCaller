@@ -309,7 +309,7 @@ if [ $overwrite -eq 1 -o ! -s "$OUT" ]; then
 	if [ $quiet -eq 0 ]; then echo "[STATUS] Getting threshold -t..."; fi
 	if [[ $cutoff == "median" ]]
 	then
-		if [ ! -s "$OUT" ]; then rm "$OUT"; fi	# since $pdir/getMedian.bash appends, need to truncate first
+		if [ -s "$OUT" ]; then rm "$OUT"; fi	# since $pdir/getMedian.bash appends, need to truncate first
 		for bam in $indivBam
 		do
 			obam=${bam/.bam/}
@@ -353,8 +353,6 @@ do
 		if [ -z "$nchrList" ]; then nchrList="$chr"; else nchrList="$nchrList $chr"; fi
 		continue;
 	fi
-
-	echo "[DEBUGGING] nchrList = $nchrList"
 
 	# obtain (chromosome-specific) cutoff: minimum of medians already computed
 	if [[ $cutoff == "median" ]]; then
