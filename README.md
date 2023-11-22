@@ -112,6 +112,8 @@ If you download the zip file ```RCLexamples.zip``` from the cybox and place it i
 unzip -j RCLexamples.zip -d example
 ```
 
+You can skip to [Tutorial Step 2](#preprocessing_example).
+
 # Preprocessing <a name = "preprocessing" />
 We have provided a [bash](https://www.gnu.org/software/bash/) preprocessing script to convert input BAM files (see [input](#input)) into the required RCL input.
 The script assumes your data have been aligned to the Ensembl assembly of the mouse or human genome.
@@ -156,13 +158,15 @@ To be sure, either delete all intermediate files (```rm example/test* example/ch
 - ```-w``` (DEFAULT: no): Overwrite any files from a previous run of the preprocessing script with the same name (option ```-n```) and the save option ```-s```.
 
 ## Tutorial Step 2 <a name = "preprocessing_example" />
-After following the example instructions in [input](data_example) to get and place the data, you can run the preprocessing tool on the sample data as demonstrated below.
+After following the instructions in [Tutorial Step 1](#data_example) to get and place the data, you can run the preprocessing tool on the sample data as demonstrated below.
 It is assumed you are at the root of the RCL git repository when you type this command.
-Also, you should choose an appropriate number of threads for your system via option -t.
+Also, you should choose an appropriate number of threads for your system via option ```-t```.
 
 ```
 bash ./preprocessing.bash -d example -b "MCF7_chr10_rep1.bam MCF7_chr10_rep2.bam" -t 12 -n test
 ```
+
+You can skip to [Tutorial Step 3](#peakcalling_example).
 
 ## Preprocessing Output <a name = "preprocessing_output" />
 
@@ -186,9 +190,9 @@ The input to peak calling is the [output](#preprocessing_input) of [Preprocessin
 It is not necessary to use the provided preprocessing script if you want to prepare input in some other way.
 Identification of good candidate regions is an important part to the success of RCL.
 
-## Tutorial Step 3 <a name = "peakcalling_example" />
+## Example: Tutorial Step 3 <a name = "peakcalling_example" />
 
-Here we demonstrate how to train the model and score the candidate regions for the MCF7, chromosome 10 data.
+Now that you have preprocessed the data in [Tutorial Step 2](#preprocessing_example), here we demonstrate how to train the model and score the candidate regions for the MCF7, chromosome 10 data.
 We assume you run this script from the root of the RCL git repository.
 
 ```
