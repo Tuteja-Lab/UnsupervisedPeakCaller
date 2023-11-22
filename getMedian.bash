@@ -3,12 +3,14 @@
 chrList=$1
 file=$2
 out=$3
+threads=$4
 
-for i in $chrList
+for chr in $chrList
 do
-m=`grep "^$i" $file | cut -f 4 | sort -rn -S 50% --parallel=5 | perl -e '$d=.5;@l=<>;print $l[int($d*$#l)]'`
-echo $file >> $out
-echo -e "$i""\t""$m" >> $out
+	# there were bugs here: need -w and quotes
+	median=`grep -w "^$chr" "$file" | cut -f 4 | sort -rn -S 50% --parallel=$threads | perl -e '$d=.5;@l=<>;print $l[int($d*$#l)]'`
+	echo "$file" >> "$out"
+	echo -e "$chr\t$median" >> "$out"
 done
 
 
