@@ -8,7 +8,6 @@ from ios import *
 import pickle
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 from sklearn.metrics import precision_recall_curve
-from matplotlib import pyplot
 from sklearn.metrics import auc
 import os
 import argparse
@@ -116,7 +115,7 @@ if __name__ == "__main__":
     classification = Classify(str(args.model))    ## train on all (80 or 90 %)
     #datapath = [args.dpath + '/' + f for f in os.listdir(args.dpath) if f.endswith('covBga.txt')]    
     datapath = [args.dpath + '/' + f + ".covBga.txt" for f in args.names]
-    print(datapath) 
+    #print("Using input data: " + str(datapath)) 
     dat = []
     dataf = []
     for file in datapath:
