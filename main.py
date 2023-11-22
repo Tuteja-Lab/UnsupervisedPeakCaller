@@ -332,7 +332,7 @@ if __name__ == "__main__":
         module = ContrastLearn_lab(hparams)
     else:
         module = ContrastLearn(hparams)
-    trainer = pl.Trainer(gpus=args.gpus, max_epochs=hparams.epochs)
+    trainer = pl.Trainer(devices=args.gpus, max_epochs=hparams.epochs)	# gpus -> devices
     trainer.fit(module)
     checkpoint_file = args.modelpath
     trainer.save_checkpoint(checkpoint_file)
