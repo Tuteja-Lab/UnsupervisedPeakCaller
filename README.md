@@ -19,30 +19,29 @@ The accompanying publication is available: [10.1101/gr.277677.123](https://doi.o
 
 # Prerequisites <a name = "prerequisites" />
 For input preprocessing steps, the following tools and R libraries are required:
-```
-[bash](https://www.gnu.org/software/bash/) (>= 5.2)
-[coreutils](https://www.gnu.org/software/coreutils/coreutils.html) (>= 9.3)
-[perl](https://www.perl.org/) (>= 5.38)
-[samtools](https://github.com/samtools/samtools) (>= 1.10)
-[bedtools2](https://github.com/arq5x/bedtools2) (>= 2.27.1)
-[parallel](https://www.gnu.org/software/parallel/) (>= 20170322)
-[R](https://www.r-project.org/) (>= 4.0.2)
-[bedops](https://github.com/bedops/bedops) (>= 2.4.35)
+- [bash](https://www.gnu.org/software/bash/) (>= 5.2)
+- [coreutils](https://www.gnu.org/software/coreutils/coreutils.html) (>= 9.3)
+- [perl](https://www.perl.org/) (>= 5.38)
+- [samtools](https://github.com/samtools/samtools) (>= 1.10)
+- [bedtools2](https://github.com/arq5x/bedtools2) (>= 2.27.1)
+- [parallel](https://www.gnu.org/software/parallel/) (>= 20170322)
+- [R](https://www.r-project.org/) (>= 4.0.2)
+- [bedops](https://github.com/bedops/bedops) (>= 2.4.35)
 
-R library [dplyr](https://dplyr.tidyverse.org/) (>= 1.0.7)
-R library [bedr](https://cran.r-project.org/web/packages/bedr/index.html) (>= 1.0.7)
-R library [doParallel](https://cran.r-project.org/web/packages/doParallel/index.html) (>= 1.0.16)
-```
-For the deep learner step, **GPU** is needed. Other packages needed are:
-```
-[Python](https://www.python.org/) (>=3.7.10)
-[PyTorch Lightning](https://lightning.ai/docs/pytorch/stable/) (>=1.5.1)
-[PyTorch](https://pytorch.org/) (>=1.10.0)
-[numpy](https://numpy.org/) (>=1.21.5)
-[pandas](https://pandas.pydata.org/) (>=1.3.5)
-[argparse](https://docs.python.org/library/argparse.html) (>=1.1)
-[scikit-learn](https://scikit-learn.org/stable/) (>=1.0.1)
-```
+- R library [dplyr](https://dplyr.tidyverse.org/) (>= 1.0.7)
+- R library [bedr](https://cran.r-project.org/web/packages/bedr/index.html) (>= 1.0.7)
+- R library [doParallel](https://cran.r-project.org/web/packages/doParallel/index.html) (>= 1.0.16)
+
+For the deep learner step, a **GPU** is needed. Other packages needed are:
+
+- [Python](https://www.python.org/) (>=3.7.10)
+- [PyTorch Lightning](https://lightning.ai/docs/pytorch/stable/) (>=1.5.1)
+- [PyTorch](https://pytorch.org/) (>=1.10.0)
+- [numpy](https://numpy.org/) (>=1.21.5)
+- [pandas](https://pandas.pydata.org/) (>=1.3.5)
+- [argparse](https://docs.python.org/library/argparse.html) (>=1.1)
+- [scikit-learn](https://scikit-learn.org/stable/) (>=1.0.1)
+
 
 # Installation <a name = "installation" />
 
