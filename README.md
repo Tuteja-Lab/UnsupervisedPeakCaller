@@ -1,4 +1,4 @@
-# Unsupervised Contrastive Peak Caller
+# The Replicative Contrastive Learner (RCL), an Unsupervised Contrastive Peak Caller
 This page described the Unsupervised contrastive peak caller known as RCL (Replicative Contrastive Learner).
 The accompanying publication is available: [10.1101/gr.277677.123](https://doi.org/10.1101/gr.277677.123).
 
