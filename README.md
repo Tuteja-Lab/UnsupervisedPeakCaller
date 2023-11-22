@@ -5,6 +5,7 @@ The accompanying publication is available: [10.1101/gr.277677.123](https://doi.o
 # Table of Contents
 1. [Prerequisites](#prerequisites)
 1. [Installation](#installation)
+1. [Tutorial](#tutorial)
 1. [Input](#input)
 	1. [Tutorial Step 1](#data_example)
 1. [Preprocessing](#preprocessing)
@@ -53,6 +54,15 @@ After installing the prerequisites, all you have to do is clone RCL and move int
 git clone https://github.com/Tuteja-Lab/UnsupervisedPeakCaller.git
 cd UnsupervisedPeakCaller
 ```
+
+# Tutorial <a name = "tutorial" />
+
+We have prepared a small tutorial to help demonstrate the RCL pipeline.
+There are three parts dispersed throughout this document. 
+Quick links are
+	1. [Tutorial Step 1](#data_example): Get the data.
+	1. [Tutorial Step 2](#preprocessing_example): Preprocess the data.
+	1. [Tutorial Step 3](#peakcalling_example): Peak calling.
 
 # Input <a name = "input" />
 
