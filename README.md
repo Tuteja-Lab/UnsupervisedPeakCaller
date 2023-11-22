@@ -4,6 +4,7 @@ The accompanying publication is available: [10.1101/gr.277677.123](https://doi.o
 
 # Table of Contents
 1. [Prerequisites](#prerequisites)
+1. [Quickstart](#quickstart)
 1. [Installation](#installation)
 1. [Tutorial](#tutorial)
 1. [Input](#input)
@@ -41,10 +42,35 @@ For the deep learner step, a **GPU** is needed. Other packages needed are:
 - [Python](https://www.python.org/) (>=3.7.10)
 - [PyTorch Lightning](https://lightning.ai/docs/pytorch/stable/) (>=1.5.1)
 - [PyTorch](https://pytorch.org/) (>=1.10.0)
-- [numpy](https://numpy.org/) (>=1.21.5)
 - [pandas](https://pandas.pydata.org/) (>=1.3.5)
-- [argparse](https://docs.python.org/library/argparse.html) (>=1.1)
+- [scipy](https://scipy.org/) (>1.11.3)
 - [scikit-learn](https://scikit-learn.org/stable/) (>=1.0.1)
+
+# Quickstart <a name = "quickstart" />
+Here is a demo of the steps needed to get started with RCL on a Fedora 39 install:
+```
+## install dependencies
+# non-python dependencies installed in the root environment
+# make sure gpu is recognized
+conda create -n rcl		# creating rcl conda environment
+conda install -n rcl pytorch	# Pytorch
+conda install -n rcl lightning	# Pytorch Lightening
+conda install -n rcl scipy scikit-learn pandas
+conda activate rcl
+
+## the remaining commands follow tutorial described in this README
+git clone https://github.com/Tuteja-Lab/UnsupervisedPeakCaller.git
+cd UnsupervisedPeakCaller 
+# task: download data as RCLexamples.zip into current directory
+unzip -j RCLexamples.zip -d example
+cp -r example example.save
+# next two commands force fresh run by overwriting existing output files
+bash ./preprocessing.bash -d example -b "MCF7_chr10_rep1.bam MCF7_chr10_rep2.bam" -t 20 -n test -w
+bash ./run_rcl.sh -d example -b "MCF7_chr10_rep1.bam MCF7_chr10_rep2.bam" -w
+diff --brief example example.save
+# stored copy of RCL input files appear in example
+# Random initialization alters RCL fit in example/rcl.ckpt and scores in example/rcl.bed a bit
+```
 
 
 # Installation <a name = "installation" />
