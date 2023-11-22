@@ -25,9 +25,8 @@ For input preprocessing steps, the following tools and R libraries are required:
 - [samtools](https://github.com/samtools/samtools) (>= 1.10)
 - [bedtools2](https://github.com/arq5x/bedtools2) (>= 2.27.1)
 - [parallel](https://www.gnu.org/software/parallel/) (>= 20170322)
-- [R](https://www.r-project.org/) (>= 4.0.2)
 - [bedops](https://github.com/bedops/bedops) (>= 2.4.35)
-
+- [R](https://www.r-project.org/) (>= 4.0.2)
 - R library [dplyr](https://dplyr.tidyverse.org/) (>= 1.0.7)
 - R library [bedr](https://cran.r-project.org/web/packages/bedr/index.html) (>= 1.0.7)
 - R library [doParallel](https://cran.r-project.org/web/packages/doParallel/index.html) (>= 1.0.16)
@@ -55,7 +54,7 @@ cd UnsupervisedPeakCaller
 # Input <a name = "input" />
 
 The RCL preprocessor requires [BAM](https://en.wikipedia.org/wiki/Binary_Alignment_Map) files for each replicate.
-The RCL program requires ...
+The RCL program requires the [output of the preprocessing step](#preprocessing_output).
 
 ## Example <a name = "data_example" />
 To demonstrate RCL, we provide the portion of the [MCF-7](https://www.encodeproject.org/search/?type=Experiment&searchTerm=ENCSR422SUG) dataset aligning to human chromosome 10.
