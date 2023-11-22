@@ -88,7 +88,7 @@ def compute_m(dat, rep_class, alllab2):
     return final_lab
 
 def make_region(datapath):
-    df = pd.read_csv(datapath, header = None, sep = "\t", names=["chr", "s", "e", "name", "conut"])
+    df = pd.read_csv(datapath, header = None, sep = "\t", names=["chr", "s", "e", "name", "count"])
     a = df.groupby("name", sort=False).s.idxmin()
     b = df.groupby("name", sort=False).e.idxmax()
     d = df.loc[a]
@@ -101,25 +101,27 @@ def make_region(datapath):
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='metric', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("--model", type=str)
-    parser.add_argument("--dpath", type=str)
-    parser.add_argument("--prefix", type=str) # output path
+    parser.add_argument("--model", type=str, default="rcl.ckpt", help="fitted RCL model from main.py")
+    parser.add_argument("--dpath", type=str, help="directory containing data")
+    parser.add_argument("--names", type=str, nargs="+", help="replicate names")
+    parser.add_argument("--prefix", type=str, help="directory to place output") # output path
     parser.add_argument("--id", type=str)
     parser.add_argument("--psudo", type=int, default = 1)
-    parser.add_argument("--preprocess_region", type=str, default = "None")
+    parser.add_argument("--preprocess_region", type=str, default = "None", help="Preprocessing regions in 4-column bed format.")
     parser.add_argument("--threshold", type=int, default = 30000)
 
     args = parser.parse_args()
 
-    #classfication = Classify('chr' + str(args.id) + "/" + str(args.model)) ## this is training seperately
-    classfication = Classify(str(args.model))    ## train on all (80 or 90 %)
-    datapath = [args.dpath + '/' + f for f in os.listdir(args.dpath) if f.endswith('covBga.txt')]    
+    #classification = Classify('chr' + str(args.id) + "/" + str(args.model)) ## this is training seperately
+    classification = Classify(str(args.model))    ## train on all (80 or 90 %)
+    #datapath = [args.dpath + '/' + f for f in os.listdir(args.dpath) if f.endswith('covBga.txt')]    
+    datapath = [args.dpath + '/' + f + ".covBga.txt" for f in args.names]
     print(datapath) 
     dat = []
     dataf = []
-    for i in datapath:
-        dat.append(read_data_new(i))
-        dataf.append(make_region(i))
+    for file in datapath:
+        dat.append(read_data_new(file))
+        dataf.append(make_region(file))
 
     alllab2 = []
     if args.psudo:
@@ -131,14 +133,14 @@ if __name__ == "__main__":
 
     rep_class = []
     for d in dat:
-        rep_class.append(get_conemb(d, classfication))
+        rep_class.append(get_conemb(d, classification))
 
     final_lab = compute_m(dat, rep_class, alllab2)
     y_true = alllab2[0]
 
     pre_reg = []
     if args.preprocess_region != "None":
-        pre_reg = pd.read_csv(args.preprocess_region, sep="\t", skiprows = 1, names=["chr", "s", "e", "name"])
+        pre_reg = pd.read_csv(args.preprocess_region, sep="\t", names=["chr", "s", "e", "name"])
     
     dicts = []
     for p, f, o in zip(rep_class, final_lab, dataf):
