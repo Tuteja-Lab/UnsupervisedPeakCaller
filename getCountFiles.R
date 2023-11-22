@@ -77,10 +77,10 @@ if (file.size(args[1]) > 0) {
 
 	if (length(grep("chr", file$chr[1])) == 0) {
 		print("Adding `chr` to chromosome name")
-		file$name <- paste0(file$chr, file$name)
 		file$chr <- paste0("chr", file$chr)
 		file$chr.c <- paste0("chr", file$chr.c)
 	}
+	file$name <- paste0(file$chr, file$name)
 
 	inputLength <- as.numeric(args[2])
 
@@ -94,7 +94,7 @@ if (file.size(args[1]) > 0) {
 	#save(result, file=args[4])
 
 	for (i in 1:length(result)) {
-		if (result[[i]][1] >= 0)
+		if (nrow(result[[i]]) > 0)
 			new <- rbind(new, result[[i]])
 	}
 	new <- new[!is.na(new$chr),]
