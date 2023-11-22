@@ -60,6 +60,7 @@ cd UnsupervisedPeakCaller
 We have prepared a small tutorial to help demonstrate the RCL pipeline.
 There are three parts dispersed throughout this document. 
 Quick links are
+
 	1. [Tutorial Step 1](#data_example): Get the data.
 	1. [Tutorial Step 2](#preprocessing_example): Preprocess the data.
 	1. [Tutorial Step 3](#peakcalling_example): Peak calling.
