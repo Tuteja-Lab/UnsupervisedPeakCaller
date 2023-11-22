@@ -50,8 +50,8 @@ For the deep learner step, a **GPU** is needed. Other packages needed are:
 Here is a demo of the steps needed to get started with RCL on a Fedora 39 install:
 ```
 ## install dependencies
-# non-python dependencies installed in the root environment
-# make sure gpu is recognized
+# task: install non-python dependencies in the root environment
+# task: make sure gpu is recognized
 conda create -n rcl		# creating rcl conda environment
 conda install -n rcl pytorch	# Pytorch
 conda install -n rcl lightning	# Pytorch Lightening
