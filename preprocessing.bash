@@ -239,9 +239,6 @@ if [ $quiet -eq 0 ]; then echo "[STATUS] Getting coverage data..."; fi
 nchrList=""
 for chr in $chrList
 do
-	if [ $verbose -eq 1 ]; then set -x; fi
-	mkdir --parents "$outdir"/$ref_prefix$chr
-	set +x
 	OUT="$outdir"/$ref_prefix"$chr"/"$prefix"_"$chr"_merged-bga.bedGraph
 	if [ $overwrite -eq 1 -o ! -s "$OUT" ]; then
 		# check for reads aligned to this chromosome
@@ -249,6 +246,7 @@ do
 		if [ $nreads -gt 0 ]; then
 			if [ $quiet -eq 0 ]; then echo "[STATUS] Computing merged coverage for reference sequence $chr."; fi
 			if [ $verbose -eq 1 ]; then set -x; fi
+			mkdir --parents "$outdir"/$ref_prefix$chr
 			samtools view -hb -@ $threads "$indir"/"$mergedBam" $chr |
 				bedtools genomecov -ibam - -pc -bga |
 				grep -w "^$chr" \
