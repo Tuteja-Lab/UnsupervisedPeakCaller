@@ -57,7 +57,9 @@ cd UnsupervisedPeakCaller
 
 # Tutorial <a name = "tutorial" />
 
-We have prepared a small tutorial to help demonstrate the RCL pipeline.
+The RCL pipeline starts after you [obtain reference-aligned read data](#input).
+The pipeline consists of a [data preprocessor](#preprocessing) and a [peak caller](#peakcalling), which are covered in detail in this document.
+To demonstrate the pipeline steps on a small dataset, we have prepared a small tutorial.
 The tutorial consists of three parts discussed in corresponding parts of this document. 
 Quick links to all three parts are listed here:
 
@@ -67,7 +69,6 @@ Quick links to all three parts are listed here:
 
 # Input <a name = "input" />
 
-The RCL pipeline consists of a [data preprocessor](#preprocessing) and [peak caller](#peakcalling).
 The RCL preprocessor requires [BAM](https://en.wikipedia.org/wiki/Binary_Alignment_Map) files for each replicate.
 The RCL peak caller requires the output of the preprocessing step.
 You can read more about [peak caller input](#preprocessing_output).
