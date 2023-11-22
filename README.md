@@ -58,8 +58,8 @@ cd UnsupervisedPeakCaller
 # Tutorial <a name = "tutorial" />
 
 We have prepared a small tutorial to help demonstrate the RCL pipeline.
-There are three parts dispersed throughout this document. 
-Quick links are:
+The tutorial consists of three parts discussed in corresponding parts of this document. 
+Quick links to all three parts are listed here:
 
 1. [Tutorial Step 1](#data_example): Get the data.
 1. [Tutorial Step 2](#preprocessing_example): Preprocess the data.
@@ -67,12 +67,12 @@ Quick links are:
 
 # Input <a name = "input" />
 
+The RCL pipeline consists of a [data preprocessor](#preprocessing) and [peak caller](#peakcalling).
 The RCL preprocessor requires [BAM](https://en.wikipedia.org/wiki/Binary_Alignment_Map) files for each replicate.
-The RCL program requires the [output of the preprocessing step](#preprocessing_output).
-We have a written a short tutorial consisting of the three steps to run RCL: [(1) get data](#data_example), [(2) preprocessing](#preprocessing_example), and [(3) peak calling](#peakcalling_example).
-The first step starts below.
+The RCL peak caller requires the output of the preprocessing step.
+You can read more about [peak caller input](#preprocessing_output).
 
-## Tutorial Step 1 <a name = "data_example" />
+## Example: Tutorial Step 1 <a name = "data_example" />
 To demonstrate RCL, we provide the portion of the [MCF-7](https://www.encodeproject.org/search/?type=Experiment&searchTerm=ENCSR422SUG) dataset aligning to human chromosome 10.
 The output for this example are provided with RCL, so if you want to skip data preprocessing for now, you can go directly to [peak calling](#peakcalling).
 Or to compare the output of your run to the tutorial output we obtained, save a copy of the ```example``` directory.
