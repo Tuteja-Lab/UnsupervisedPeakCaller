@@ -2,15 +2,19 @@
 args = commandArgs(trailingOnly=TRUE)
 
 # test if there is at least four arguments: if not, return an error
-if (length(args) < 5) {
-	stop("At least two argument must be supplied.", call.=FALSE)
+if (length(args) < 4) {
+	stop("At least five argument must be supplied.", call.=FALSE)
+}
+if (length(args) == 4) {
+	ref.prefix = ""
+} else {
+	ref.prefix = args[5]
 }
 
 dir=args[1]
 chr.file=args[2]
 prefix=args[3]
-ref.prefix=args[4]
-out.file=args[5]
+out.file=args[4]
 
 library(dplyr)
 
