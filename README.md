@@ -69,7 +69,7 @@ bash ./preprocessing.bash -d example -b "MCF7_chr10_rep1.bam MCF7_chr10_rep2.bam
 bash ./run_rcl.sh -d example -b "MCF7_chr10_rep1.bam MCF7_chr10_rep2.bam" -w
 diff --brief example example.save
 # stored copy of RCL input files appear in example
-# Random initialization alters RCL fit in example/rcl.ckpt and scores in example/rcl.bed a bit
+# random initialization slightly alters RCL fit (example/rcl.ckpt) and scores (example/rcl.bed)
 ```
 
 
