@@ -88,7 +88,7 @@ unzip -j RCLexamples.zip -d example
 # Preprocessing <a name = "preprocessing" />
 We have provided a [bash](https://www.gnu.org/software/bash/) preprocessing script to convert input BAM files (see [input](#input)) into the required RCL input.
 The script assumes your data have been aligned to the Ensembl assembly of the mouse or human genome.
-If not, no blacklist regions will be removed.
+If not, the script will still run, but no blacklist regions will be removed.
 
 
 ## Preprocessing Input <a name = "preprocessing_input" />
@@ -97,20 +97,20 @@ The preprocessing input is the same as the [Input](#input) to the whole pipeline
 
 ## Preprocessing Command-Line Options <a name = "preprocessing_options" />
 
-For more information about the preprocessing script type ```bash ./preprocessing -?``` from the RCL git repository root.
+For more information about the preprocessing script type ```bash ./preprocessing.bash -?``` from the RCL git repository root.
 The most important command-line options are mentioned below:
 
-- ```-b```: The BAM files for the individual replicates.
-You must name at least two BAM files from two replicate experiments.
+- ```-b``` (DEFAULT: none, you must provide): The BAM files for the individual replicates.
+You must name at least two BAM files from replicate experiments.
 Space-separate the names and surround the list with double quotes.
 For example, the tutorial is run with this options set as ```-b "MCF7_chr10_rep1.bam MCF7_chr10_rep2.bam"```.
 - ```-c``` (DEFAULT: ```median```): An integer coverage cutoff to identify candidate peaks.
 The default is to use the minimum median (zero coverage sites excluded) observed across replicates on a per-chromosome basis.
 However, you can call more peaks by reducing this number.
-In the [RCL publication](https://doi.org/10.1101/gr.277677.123), we demonstrate that decreasing this cutoff generally enhances RCL performance.
+In the [RCL publication](https://doi.org/10.1101/gr.277677.123), we demonstrate that decreasing this cutoff generally enhances RCL performance, but it cannot be less than 1.
 - ```-d``` (DEFAULT: ```example```): The data directory.
-- ```-g``` (DEFAULT: ```hg```): Indicate the genome your reads were aligned to. 
-The default assumes you aligned your reads to the Ensembl assembly hg38.
+- ```-g``` (DEFAULT: ```hg```): Indicate the genome reads in the input BAM files are aligned to.
+The default assumes the reads are aligned to the Ensembl assembly hg38.
 If you are using the Ensembl assembly of mouse, you should set option ```-g mm```.
 If you are using another genome, you should name it as you like ```-g my_id```, but not ```mm``` or ```hg```.
 - ```-t``` (DEFAULT: ```1```): Set the number of threads you would like to use. 
@@ -137,11 +137,19 @@ Also, you should choose an appropriate number of threads for your system via opt
 bash ./preprocessing.bash -d example -b "MCF7_chr10_rep1.bam MCF7_chr10_rep2.bam" -t 12 -n test
 ```
 
-## Output of preprocessing <a name = "preprocessing_output" />
+## Preprocessing Output <a name = "preprocessing_output" />
+
 The final output of the preprocessing consists of two types of [Bed](https://genome.ucsc.edu/FAQ/FAQformat.html#format1) files.
 
 	1. [Bed](https://genome.ucsc.edu/FAQ/FAQformat.html#format1)-formatted (5-column) for each of the replicates and each of the reference sequences containing the coverage for each fixed-length fragment chosen by [preprocessing](#preprocessing) for input to RCL. Specifically, the coverage for replicate REP in reference sequence SEQ is stored in DIR/SEQ/REP.covBga.txt, where REP is the basename (without .bam extension) of either [input](#input) BAM file, SEQ is a reference sequence found in these BAM files, and DIR is the input directory passed ```preprocessing.bash``` via command option ```-d```.
 	1. [Bed](https://genome.ucsc.edu/FAQ/FAQformat.html#format1)-formatted (4-column) containing the candidate peak regions that RCL will score.
+
+## Preprocessing Cleanup <a name = "preprocessing_cleanup" />
+
+Data preprocessing produces many large intermediate files.
+By default, these intermediate files are deleted, leaving only the information about the candidate regions needed by the RC [peak caller](#peakcalling).
+However, if you use the save option (```-s``` option) all these intermediate files will be saved, prefixed by the chosen name (```-n``` option).
+To delete these files, carefully use the following command: ```rm example/test* example/chr*/test*```, to clean up a previous preprocessing run with options ```-i example -n test```.
 
 # Peak Calling <a name = "peakcalling" />
 We provide a [bash](https://www.gnu.org/software/bash/) script ```run_rcl.sh``` that fits RCL and assigns predictive peaks scores to each of the candidate regions prepared by [Preprocessing](#preprocessing).
