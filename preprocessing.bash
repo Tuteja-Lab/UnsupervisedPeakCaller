@@ -637,7 +637,7 @@ echo -e "Candidate regions are in file:\n\t$candidate_regions_file"
 
 ### Step 6: clean up temporary files
 if [ $save -eq 0 ]; then
-	if [ $quiet -eq 0]; then echo "[STATUS] Cleaning up temporary files..."; fi
+	if [ $quiet -eq 0 ]; then echo "[STATUS] Cleaning up temporary files..."; fi
 	if [ $verbose -eq 1 ]; then set -x; fi
 	rm "$outdir"/"$prefix"*-bga.bedGraph
 	rm "$outdir"/$ref_prefix*/"$prefix"*-bga.bedGraph
