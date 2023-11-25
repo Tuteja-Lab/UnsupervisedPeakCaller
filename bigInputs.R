@@ -16,7 +16,7 @@ chr.file=args[2]
 prefix=args[3]
 out.file=args[4]
 
-library(dplyr)
+suppressPackageStartupMessages(library(dplyr))
 
 final <- data.frame(V1=NA, V2=NA, V3=NA, V4=NA)
 chr <- read.table(paste0(dir, "/", chr.file), header = F)
