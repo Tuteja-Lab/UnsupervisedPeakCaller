@@ -17,7 +17,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 ## read coverage in format 
 ## pos cov region mac_lab
 ## 3106561	5	region_2709 0
-def read_covearge(file, name = 'lab', pos = 3):
+def read_coverage(file, name = 'lab', pos = 3):
   # name can be 'lab', 'cov', 'pos' 'region'
     out = []
 
