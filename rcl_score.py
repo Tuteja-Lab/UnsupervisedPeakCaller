@@ -108,6 +108,7 @@ if __name__ == "__main__":
     parser.add_argument("--psudo", type=int, default = 1)
     parser.add_argument("--preprocess_region", type=str, default = "None", help="Preprocessing regions in 4-column bed format.")
     parser.add_argument("--threshold", type=int, default = 30000)
+    parser.add_argument("--debug", action = "store_true")
 
     args = parser.parse_args()
 
