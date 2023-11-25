@@ -2,7 +2,9 @@
 # Run RCL.
 # Input: PATH to data files, list of BAM file replicates BFILE1, BFILE2, ...
 # Assumes: PATH/chrList.txt, PATH/chr*/BFILE1.covBga.txt, PATH/chr*/BFILE2.covBga.txt, PATH/bigInputs.txt created by preprocessing.bash
-# Output: ??
+# Output:
+#	PATH/rcl.ckpt	fitted model
+#	PATH/rcl.bed	candidate peaks and scores
 
 path="."
 epoch=25
@@ -11,36 +13,39 @@ ext=.covBga.txt
 ref_prefix="chr"
 save=0
 overwrite=0
+debug=""
 
 helpFunction()
 {
 	echo ""
 	echo "Usage: $0 [-d PATH] -b \"BAM_FILE1 BAM_FILE2[ BAM_FILE3...]\""
-	echo -e "\t-b list of names of preprocessed replicate BAM files, surrounded by double quotes."
-	echo -e "\t   These BAM files should have alread been preprocessed by preprocessing.bash."
-	echo -e "\t   Example (from tutorial): \"MCF7_chr10_rep1.bam MCF7_chr10_rep2.bam\""
-	echo -e "\t-d path to data files (DEFAULT: $path)."
-	echo -e "\t-e number of epochs (DEFAULT: $epoch)."
-	echo -e "\t-r Reference sequence name prefix (DEFAULT: $ref_prefix)."
-	echo -e "\t-s batch size (DEFAULT: $batch)."
-	echo -e "\t-v save output files (DEFAULT: no)."
-	echo -e "\t-w overwrite existing files (DEFAULT: no)."
-	echo -e "\t-x Extension for coverage files (DEFAULT: .covBga.txt)."
-	echo -e "\t   Chromosome j coverage file for replicate m assumed to be"
-	echo -e "\t   PATH/chrj/BASEm_j.covBga.txt, where BASEm is BAM_FILEm (-f) without .bam extension."
+	echo -e "\t-b STR list of preprocessed replicate BAM files, surrounded by double quotes."
+	echo -e "\t       BAM files should have alread been preprocessed by preprocessing.bash."
+	echo -e "\t       Example (from tutorial): \"MCF7_chr10_rep1.bam MCF7_chr10_rep2.bam\""
+	echo -e "\t-d STR path to Data files (DEFAULT: $path)."
+	echo -e "\t-e INT number of Epochs (DEFAULT: $epoch)."
+	echo -e "\t-g     turn on debuGging output (DEFAULT: no)."
+	echo -e "\t-h INT batcH size (DEFAULT: $batch)."
+	echo -e "\t-r STR Reference sequence name prefix (DEFAULT: $ref_prefix)."
+	echo -e "\t-s     Save output files (DEFAULT: no)."
+	echo -e "\t-w     overWrite existing files (DEFAULT: no)."
+	echo -e "\t-x STR eXtension for coverage files (DEFAULT: $ext)."
+	echo -e "\t       Chromosome j coverage file for replicate m assumed to be"
+	echo -e "\t       PATH/chrj/BASEm_j.covBga.txt, where BASEm is BAM_FILEm (-f) without .bam extension."
 	exit 1 # Exit script after printing help
 }
 
-while getopts wv?b:d:b:e:s:x: flag
+while getopts ?gswb:d:e:h:r:x: flag
 do
 	case "${flag}" in
 		b) fname=${OPTARG};;
 		d) path=${OPTARG};;
 		e) epoch=${OPTARG};;
+		g) debug=--debug;;
 		r) ref_prefix=${OPTARG};;
-		s) batch=${OPTARG};;
+		h) batch=${OPTARG};;
 		w) overwrite=1;;
-		v) save=1;;
+		s) save=1;;
 		x) ext=${OPTARG};;
 		?) helpFunction ;; # Print helpFunction	
 	esac
@@ -76,7 +81,7 @@ done
 
 if [ $overwrite -eq 1 -o ! -s "$path"/rcl.ckpt ]; then
 	echo "Number of reps ${nreps}, start training"
-	python main.py --epochs $epoch --batch_size $batch --datapath "$path" --n_rep $nreps --modelpath "$path"/rcl.ckpt &> "$path"/out.err
+	python main.py $debug --epochs $epoch --batch_size $batch --datapath "$path" --n_rep $nreps --modelpath "$path"/rcl.ckpt &> "$path"/out.err
 	echo "Finish training, start writing results (if your data is large, please give more memory)"
 else
 	echo "Using existing \"$path/rcl.ckpt\" file"
@@ -84,7 +89,7 @@ fi
 
 if [ $overwrite -eq 1 -o ! -s "$path"/rcl.bed ]; then
 	while read chr; do
-		python rcl_score.py --model "$path"/rcl.ckpt --dpath "$path"/chr${chr} --names $rep_names --preprocess_region "$path"/bigInputs.txt --id $chr --prefix "$path"
+		python rcl_score.py $debug --model "$path"/rcl.ckpt --dpath "$path"/$ref_prefix"$chr" --names $rep_names --preprocess_region "$path"/bigInputs.txt --id $chr --prefix "$path"
 	done < "$path"/chrList.txt
 	cat "$path"/rcl_*bed > "$path"/rcl.bed
 else
