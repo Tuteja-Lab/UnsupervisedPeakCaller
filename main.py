@@ -14,7 +14,7 @@ import pickle
 # from pytorch_lightning.loggers import WandbLogger
 
 from conclu import *
-from ios import read_data_new, read_covearge, read_fragment, combine_reps
+from ios import read_data_new, read_coverage, read_fragment, combine_reps
 
 import warnings
 warnings.filterwarnings("ignore", ".*does not have many workers.*")
@@ -252,6 +252,7 @@ if __name__ == "__main__":
     parser.add_argument("--seed", default=0, type=int)
     parser.add_argument("--n_class", default=2, type=int)
     parser.add_argument("--sample", default='null', type=str)
+    parser.add_argument("--debug", action="store_true")
 
     args = parser.parse_args()
     
@@ -260,8 +261,10 @@ if __name__ == "__main__":
     n_rep = args.n_rep
     datapath = [args.datapath + '/rep' + str(x)  + '.txt'  for x in list(range(1, int(n_rep) + 1))]
     d = []
-    for i in datapath:
-        cov = read_data_new(i)
+    for file in datapath:
+        if args.debug:
+            print("Reading RCL input file " + file + ".")
+        cov = read_data_new(file)
         d.append(cov)
     # test set
     if args.sample != 'null':
