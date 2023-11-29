@@ -58,6 +58,8 @@ def read_coverage(file, name = 'lab', pos = 3):
     dat.append(np.array(tmp))
     return np.array(dat)
 
+##
+# Read bedgraph file and convert it into a dense coverage vector.
 def read_data_new(file):
     out = []
     last_name = None
@@ -65,25 +67,23 @@ def read_data_new(file):
     with open(file, 'r') as f:
         for line in f.readlines():   
             tmp = line.split()
-            count = int(tmp[2]) - int(tmp[1])
-            v = count * [int(tmp[4])]
-            out.append([v, tmp[3]])
+            count = int(tmp[2]) - int(tmp[1])    # length of subregion
+            v = count * [int(tmp[4])]            # total nucleotide coverage
+            out.append([v, tmp[3]])              # coverage, name pairs
 
-    last_name = out[0][1]
+    last_name = out[0][1]    # first subregion of peak candidate region
     dat = []
     last_i = 0
     i = 0
     for l in out:
         name = l[1]
-        if name != last_name:
-            tmp = [j[0] for j in out[last_i:i]]
-            tmp = [item for sublist in tmp for item in sublist]
+        if name != last_name:                                      # entering new peak candidate
+            tmp = [j[0] for j in out[last_i:i]]                    # extract coverages of last subregion
+            tmp = [item for sublist in tmp for item in sublist]    # vectorize
             dat.append(np.array(tmp))
             last_i = i
-            i += 1
             last_name = name
-        else:
-            i += 1
+        i += 1
     tmp = [j[0] for j in out[last_i:i]]
     tmp = [item for sublist in tmp for item in sublist]
     dat.append(np.array(tmp))
