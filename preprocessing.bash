@@ -46,6 +46,7 @@ zerowrite=0
 save=0
 ref_prefix="chr"
 exclude="MATCHES_NOTHING_ON_PLANET_EARTH"
+sorted=0
 
 helpFunction()
 {
@@ -66,8 +67,9 @@ helpFunction()
 	echo -e "\t-p STR Program directory where preprocessing scripts are located (DEFAULT: $pdir)."
 	echo -e "\t-t INT Number of threads to use (DEFAULT: $threads)."
 	echo -e "\t-q     Quiet, no output of progress (DEFAULT: no)."
-	echo -e "\t-r STR Reference sequence name prefix (DEAFULT: $ref_prefix)."
+	echo -e "\t-r STR Reference sequence name prefix (DEFAULT: $ref_prefix)."
 	echo -e "\t-s     Save intermediate files (DEFAULT: no)."
+	echo -e "\t-S     Use this to assert the bam files ARE sorted (DEFAULT: no)."
 	echo -e "\t-v     Verbose debugging output (DEFAULT: no)."
 	echo -e "\t-w INT Overwrite existing files from stage INT (DEFAULT: no)."
 	echo -e "\t       Stage 1: Coverage bedgraphs per replicate, merged per reference sequence (*-bga.bedGraph)."
@@ -87,7 +89,7 @@ helpFunction()
 stop=0
 
 ## read command line
-while getopts "?12345678qsvb:c:d:e:g:L:m:n:p:r:o:t:w:z:" opt
+while getopts "?12345678qsSvb:c:d:e:g:L:m:n:p:r:o:t:w:z:" opt
 do
 	case "$opt" in
 		b) indivBam="$OPTARG";;
@@ -103,6 +105,7 @@ do
 		q) quiet=1;;
 		r) ref_prefix="$OPTARG";;
 		s) save=1;;
+		S) sorted=1;;
 		t) threads="$OPTARG";;
 		v) verbose=1;;
 		w) overwrite=$OPTARG;;
@@ -199,23 +202,27 @@ for bam in $indivBam; do
 			exit 1
 		fi
 		echo "[STAGE 0] ($0:${LINENO}) Detected no index for $indir/$bam..."
-		# no easy way to know if sorted, so sort first
-		obam=${bam/.bam/.srt.bam}
-		if [ $quiet -eq 0 ]; then echo "[STAGE 0] ($0:${LINENO}) Sorting $indir/$bam and writing to $indir/$obam..."; fi
-		if [ $verbose -eq 1 ]; then set -x; fi
-		samtools sort -@ $threads -o "$indir"/"$obam" "$indir"/"$bam"
-		set +x
+		if [ $sorted -eq 0 ]; then
+			# no easy way to know if sorted, so sort first
+			obam=${bam/.bam/.srt.bam}
+			if [ $quiet -eq 0 ]; then echo "[STAGE 0] ($0:${LINENO}) Sorting $indir/$bam and writing to $indir/$obam..."; fi
+			if [ $verbose -eq 1 ]; then set -x; fi
+			samtools sort -@ $threads -o "$indir"/"$obam" "$indir"/"$bam"
+			set +x
+		else
+			obam=$bam
+		fi
 		if [ $quiet -eq 0 ]; then echo "[STAGE 0] ($0:${LINENO}) Indexing $indir/$obam..."; fi
 		if [ $verbose -eq 1 ]; then set -x; fi
 		samtools index -@ $threads "$indir"/"$obam"
 		set +x
-		if [ -z $nindivBam ]; then
+		if [ -z "$nindivBam" ]; then
 			nindivBam="$obam"
 		else
 			nindivBam="$nindivBam $obam"
 		fi
 	else	# this one does have an index!
-		if [ -z $nindivBam ]; then
+		if [ -z "$nindivBam" ]; then
 			nindivBam="$bam"
 		else
 			nindivBam="$nindivBam $bam"
@@ -233,7 +240,7 @@ fi
 if [ ! -s "$indir"/"$mergedBam" ]; then
 	if [ $quiet -eq 0 ]; then echo "[STAGE 0] ($0:${LINENO}) Creating merged bam file $indir/$mergedBam..."; fi
 	if [ $verbose -eq 1 ]; then set -x; fi
-	pushd "$indir"; samtools merge -@ $threads "$mergedBam" $indivBam; popd
+	pushd "$indir" > /dev/null; samtools merge -@ $threads "$mergedBam" $indivBam; popd > /dev/null
 	set +x
 fi
 if [ ! -s "$indir"/"$mergedBam".bai ]; then
