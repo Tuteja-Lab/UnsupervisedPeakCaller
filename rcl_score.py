@@ -54,6 +54,12 @@ class Embed(nn.Module):
         return h, decoded
     
 
+##
+# Oh, please, what is this doing?
+# Massage replicated coverage of single segment into the input expected by RCL.
+#
+# @param pos	rows segment, columns coverage
+# @param func	rcl prediction function
 def get_conemb(pos, func):
     pos_tensor = []
     for t in pos:
@@ -65,8 +71,12 @@ def get_conemb(pos, func):
     pos = func(pos_tensor)
     return pos   
 
-def compute_m(dat, rep_class, alllab2):
-    selected = 0
+##
+# Assign peak label to that class most correlated with the highest signal.
+#
+# @param rep_class    class probabilities predicted by RCL
+# @param alllab2      peaks called by sheer nucleotide coverage
+def compute_m(rep_class, alllab2, debug=False):
     m = alllab2[0]
     final_lab = []
     for d in rep_class:
@@ -75,6 +85,9 @@ def compute_m(dat, rep_class, alllab2):
 
         lab2 = torch.argmin(d.squeeze(1), dim=1).tolist()
         f2 = f1_score(m, lab2)
+
+        if debug:
+            print("compute_m:", f1, f2)
 
         if f2 > f1:
             lab = lab2
@@ -86,13 +99,15 @@ def compute_m(dat, rep_class, alllab2):
 
     return final_lab
 
+##
+# Extract chr, start, end, and name of every distinct region in bed file.
 def make_region(datapath):
     df = pd.read_csv(datapath, header = None, sep = "\t", names=["chr", "s", "e", "name", "count"])
     a = df.groupby("name", sort=False).s.idxmin()
     b = df.groupby("name", sort=False).e.idxmax()
-    d = df.loc[a]
-    d['e'] =  df.loc[b]['e'].values
-    d = d[d.columns[1:4]]
+    d = df.loc[a]                    # entries with minimum start for each segment
+    d['e'] =  df.loc[b]['e'].values  # overwrite its end with maximum end for same segment
+    d = d[d.columns[1:4]]            # keep only chr, s, e, and name
     d = d.reset_index(drop=True)
     return d
 
@@ -116,13 +131,18 @@ if __name__ == "__main__":
     classification = Classify(str(args.model))    ## train on all (80 or 90 %)
     #datapath = [args.dpath + '/' + f for f in os.listdir(args.dpath) if f.endswith('covBga.txt')]    
     datapath = [args.dpath + '/' + f + ".covBga.txt" for f in args.names]
-    #print("Using input data: " + str(datapath)) 
-    dat = []
+    if args.debug:
+       print("Using input data: " + str(datapath)) 
+    dat = []        # tensor: dense coverage per segment per replicate
     dataf = []
     for file in datapath:
         dat.append(read_data_new(file))
         dataf.append(make_region(file))
+    if args.debug:
+        print("Coverage, data set 1:", dat[0])
+        print("Regions:", dataf[0])
 
+    # count nucleotides covering each segment in each replicate
     alllab2 = []
     if args.psudo:
         for d in dat:
@@ -135,16 +155,27 @@ if __name__ == "__main__":
     for d in dat:
         rep_class.append(get_conemb(d, classification))
 
-    final_lab = compute_m(dat, rep_class, alllab2)
+    if args.debug:
+        print("rep_class: ", rep_class[0])
+
+    # choose peak as class 0 or 1 based on which one has higher coverage
+    #final_lab = compute_m(rep_class, alllab2, args.debug)
+    # better yet: primitive peaks (based on nucleotide coverage) from replicate 1 as truth
     y_true = alllab2[0]
 
     pre_reg = []
     if args.preprocess_region != "None":
+        if args.debug:
+            print("Using preprocessing regions from " + args.preprocess_region)
         pre_reg = pd.read_csv(args.preprocess_region, sep="\t", names=["chr", "s", "e", "name"])
     
     dicts = []
-    for p, f, o in zip(rep_class, final_lab, dataf):
+    i = 1
+    for p, o in zip(rep_class, dataf):
         p = p.squeeze(1).detach().cpu().numpy()
+        if args.debug:
+            print("y_scores:", p[:, 0])
+        # decide which RCL label is peak based on correlation with "truth" labels
         y_scores = p[:, 0]
         precision, recall, thresholds = precision_recall_curve(y_true, y_scores)
         auc1 = auc(recall, precision)
@@ -152,17 +183,23 @@ if __name__ == "__main__":
         precision2, recall2, thresholds = precision_recall_curve(y_true, y_scores)
         auc2 = auc(recall2, precision2)
         if auc2 > auc1:
-            #print(auc2, recall2, precision2)
+            if args.debug:
+               print("Taking label 2: auc=", auc2)
             y_scores = p[:, 1]
         else:
-            #print(auc1, recall, precision)
+            if args.debug:
+               print("Taking label 1: auc=", auc1)
             y_scores = p[:, 0]
 
         d = {'chr': str(args.id), 'score': y_scores}
         
         df = pd.DataFrame(data=d)
         df = pd.concat([df, o], axis=1)[["chr", "s", "e", "name", "score"]]
+        df = df.rename(columns={'score' : 'score' + str(i)})
+        if args.debug:
+            print(df)
         dicts.append(df)
+        i += 1
         
     df = reduce(lambda df1, df2: pd.merge(df1, df2, on = ["chr", "s", "e", "name"]), dicts)    
     cols = df.columns[~df.columns.isin(["chr", "s", "e", "name"])]
