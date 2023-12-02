@@ -37,7 +37,7 @@ getSegments <- function(s) {
 		sub <- process3_1(sub, s)
 	} else {
 		sub1 <- sub[which(sub$counts >= quantile(sub$counts, 0.95)),]
-		sub1c <- sub1
+		#sub1c <- sub1
 		sub1 <- sub1[,c("chr.c", "start.c", "end.c")]
 		colnames(sub1) <- c("chr", "start", "end")
 
@@ -75,10 +75,12 @@ if (file.size(args[1]) > 0) {
 	file <- read.table(args[1], header = F)
 	colnames(file) <- c("chr", "start", "end", "name", "chr.c", "start.c", "end.c", "counts")
 
+	add.chr <- F
 	if (length(grep("chr", file$chr[1])) == 0) {
-		print("Adding `chr` to chromosome name")
+		#print("Adding `chr` to chromosome name")
 		file$chr <- paste0("chr", file$chr)
 		file$chr.c <- paste0("chr", file$chr.c)
+		add.chr <- T
 	}
 	file$name <- paste0(file$chr, file$name)
 
@@ -98,6 +100,10 @@ if (file.size(args[1]) > 0) {
 			new <- rbind(new, result[[i]])
 	}
 	new <- new[!is.na(new$chr),]
+	if (add.chr) {
+		new$chr <- sub("chr", "", new$chr)
+		new$name <- sub("chr", "", new$name)
+	}
 	write.table(new, file=args[4], quote = F, sep = "\t", row.names = F)
 } else {
 	print(paste("Input", args[1], "has 0 line."))
