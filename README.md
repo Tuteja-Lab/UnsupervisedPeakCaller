@@ -117,7 +117,7 @@ You can skip to [Tutorial Step 2](#preprocessing_example).
 # Preprocessing <a name = "preprocessing" />
 We have provided a [bash](https://www.gnu.org/software/bash/) preprocessing script to convert input BAM files (see [input](#input)) into the required [RCL input](#rcl_input).
 The script assumes your data have been aligned to the Ensembl assembly of the mouse or human genome.
-If not, the script will still run, but no blacklist regions will be removed.
+If not, the script will still run (though it is important you use [command line option](#preprocessing_options) `-g`), but no blacklist regions will be removed.
 
 
 ## Preprocessing Input <a name = "preprocessing_input" />
