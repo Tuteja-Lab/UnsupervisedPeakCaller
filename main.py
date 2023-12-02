@@ -335,7 +335,10 @@ if __name__ == "__main__":
         module = ContrastLearn_lab(hparams)
     else:
         module = ContrastLearn(hparams)
-    trainer = pl.Trainer(devices=args.gpus, max_epochs=hparams.epochs)	# gpus -> devices
+    if torch.__version__.startswith("1"):
+        trainer = pl.Trainer(gpus=args.gpus, max_epochs=hparams.epochs)	# gpus deprecated in 1.7 and removed in 2.0
+    else:
+        trainer = pl.Trainer(devices=args.gpus, max_epochs=hparams.epochs)
     trainer.fit(module)
     checkpoint_file = args.modelpath
     trainer.save_checkpoint(checkpoint_file)
