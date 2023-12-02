@@ -97,8 +97,8 @@ Quick links to all three parts are listed here:
 # Input <a name = "input" />
 
 The RCL preprocessor requires [BAM](https://en.wikipedia.org/wiki/Binary_Alignment_Map) files for each replicate.
-The RCL peak caller requires the output of the preprocessing step.
-You can read more about [peak caller input](#preprocessing_output).
+The RCL peak caller requires the [output of the preprocessing step](#preprocessing_output).
+You can read more about [peak caller input](#rcl_input).
 
 ## Example: Tutorial Step 1 <a name = "data_example" />
 To demonstrate RCL, we provide the portion of the [MCF-7](https://www.encodeproject.org/search/?type=Experiment&searchTerm=ENCSR422SUG) dataset aligning to human chromosome 10.
