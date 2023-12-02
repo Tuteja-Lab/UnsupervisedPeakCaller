@@ -98,7 +98,7 @@ Quick links to all three parts are listed here:
 
 The RCL preprocessor requires [BAM](https://en.wikipedia.org/wiki/Binary_Alignment_Map) files for each replicate.
 The RCL peak caller requires the [output of the preprocessing step](#preprocessing_output).
-You can read more about [peak caller input](#rcl_input).
+You can read more about [peak caller input](#peakcalling_input).
 
 ## Example: Tutorial Step 1 <a name = "data_example" />
 To demonstrate RCL, we provide the portion of the [MCF-7](https://www.encodeproject.org/search/?type=Experiment&searchTerm=ENCSR422SUG) dataset aligning to human chromosome 10.
@@ -115,7 +115,7 @@ unzip -j RCLexamples.zip -d example
 You can skip to [Tutorial Step 2](#preprocessing_example).
 
 # Preprocessing <a name = "preprocessing" />
-We have provided a [bash](https://www.gnu.org/software/bash/) preprocessing script to convert input BAM files (see [input](#input)) into the required [RCL input](#rcl_input).
+We have provided a [bash](https://www.gnu.org/software/bash/) preprocessing script to convert input BAM files (see [input](#input)) into the required [RCL input](#peakcalling_input).
 The script assumes your data have been aligned to the Ensembl assembly of the mouse or human genome.
 If not, the script will still run (though it is important you use [command line option](#preprocessing_options) `-g`), but no blacklist regions will be removed.
 
@@ -188,7 +188,7 @@ To delete these files, carefully use the following command: ```rm example/test* 
 # Peak Calling <a name = "peakcalling" />
 We provide a [bash](https://www.gnu.org/software/bash/) script ```run_rcl.sh``` that fits RCL and assigns predictive peaks scores to each of the candidate regions prepared by the [preprocessing step](#preprocessing) or your own preprocessing pipeline.
 
-## Peak Calling Input <a name = "rcl_input" />
+## Peak Calling Input <a name = "peakcalling_input" />
 The easiest way to get input for RCL peak calling is to use the [preprocessing](#preprocessing) step, but you can prepare input in some other way.
 Identification of good candidate regions is an important part to the success of RCL.
 Here are the files you need to provide.
