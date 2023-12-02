@@ -46,7 +46,6 @@ zerowrite=0
 save=0
 ref_prefix="chr"
 exclude="MATCHES_NOTHING_ON_PLANET_EARTH"
-sorted=0
 
 helpFunction()
 {
@@ -54,7 +53,7 @@ helpFunction()
 	echo "Usage: $0 -d INPUT_DIR -b \"BAM_REP1 BAM_REP2[ BAM_REP3...]\" -n NAME"
 	echo -e "\t-b STR BAM files of replicate experiments. Provide as space-separated strings surround by double quotes." 
 	echo -e "\t       For example: -b \"MCF7_chr10_rep1.bam MCF7_chr10_rep2.bam\""
-		#\n\t	Must be sorted and indexed, though if index is missing, we will sort and index for you."
+		#\n\t	Must be sorted and indexed, though if index is missing, we will index for you."
 	echo -e "\t-c STR Cutoff for coverage. Either \"median\" or integer (DEFAULT: cutoff)."
 	echo -e "\t-d STR Input directory where BAM and BAI input files are stored (DEFAULT: $indir)."
 	echo -e "\t-e STR Exclude reference sequence names matching grep extended regexp (DEFAULT: not set)."
@@ -69,7 +68,6 @@ helpFunction()
 	echo -e "\t-q     Quiet, no output of progress (DEFAULT: no)."
 	echo -e "\t-r STR Reference sequence name prefix (DEFAULT: $ref_prefix)."
 	echo -e "\t-s     Save intermediate files (DEFAULT: no)."
-	echo -e "\t-S     Use this to assert the bam files ARE sorted (DEFAULT: no)."
 	echo -e "\t-v     Verbose debugging output (DEFAULT: no)."
 	echo -e "\t-w INT Overwrite existing files from stage INT (DEFAULT: no)."
 	echo -e "\t       Stage 1: Coverage bedgraphs per replicate, merged per reference sequence (*-bga.bedGraph)."
@@ -89,7 +87,7 @@ helpFunction()
 stop=0
 
 ## read command line
-while getopts "?12345678qsSvb:c:d:e:g:L:m:n:p:r:o:t:w:z:" opt
+while getopts "?12345678qsvb:c:d:e:g:L:m:n:p:r:o:t:w:z:" opt
 do
 	case "$opt" in
 		b) indivBam="$OPTARG";;
@@ -105,7 +103,6 @@ do
 		q) quiet=1;;
 		r) ref_prefix="$OPTARG";;
 		s) save=1;;
-		S) sorted=1;;
 		t) threads="$OPTARG";;
 		v) verbose=1;;
 		w) overwrite=$OPTARG;;
@@ -180,7 +177,6 @@ fi
 ### Stage 0 Create any missing files.
 
 ## sort and index individual BAM files if they are not yet indexed
-# cannot tell if they are not sorted, so will always sort (again) if there is no index
 nindivBam=""
 for bam in $indivBam; do
 	# BAM file missing
@@ -202,8 +198,8 @@ for bam in $indivBam; do
 			exit 1
 		fi
 		echo "[STAGE 0] ($0:${LINENO}) Detected no index for $indir/$bam..."
-		if [ $sorted -eq 0 ]; then
-			# no easy way to know if sorted, so sort first
+		sorted=`samtools view -H "$indir"/$bam | grep SO:coordinate`
+		if [ -z "$sorted" ]; then
 			obam=${bam/.bam/.srt.bam}
 			if [ $quiet -eq 0 ]; then echo "[STAGE 0] ($0:${LINENO}) Sorting $indir/$bam and writing to $indir/$obam..."; fi
 			if [ $verbose -eq 1 ]; then set -x; fi
@@ -231,8 +227,10 @@ for bam in $indivBam; do
 done
 
 # overwrite BAM file list
-if [ -z "$nindivBam" ]; then
-	if [ $verbose -eq 1 ]; then echo "[STAGE 0] ($0:${LINENO}) Resetting individual BAM files to $nindivBam"; fi
+if [ ! -z "$nindivBam" ]; then
+	if [[ "$nindivBam" =~ ".*\.srt\.bam" ]]; then
+		echo "[WARNING] We wrote sorted BAM files \"$nindivBam\". You should use these files instead of \"$indivBam\" in future runs of this script."
+	fi
 	indivBam=$nindivBam
 fi
 
@@ -296,7 +294,7 @@ do
 			echo "[STAGE 1] ($0:${LINENO}) No reads aligned to reference sequence $chr in \"$indir/$mergedBam\"."
 		fi
 	else
-		if [ $quiet -eq 0 ]; then echo "[STAGE 1] Using existing coverage file $OUT"; fi
+		if [ $quiet -eq 0 ]; then echo "[STAGE 1] ($0:${LINENO}) Using existing coverage file $OUT"; fi
 		if [ -z "$nchrList" ]; then
 			nchrList="$chr"
 		else
@@ -712,11 +710,6 @@ cp "$candidate_regions_file" "$outdir"/bigInputs.txt
 if [ $quiet -eq 0 ]; then
 	echo -e "[STAGE 9] ($0:${LINENO}) Data preprocessing has completed succesfully.\n\n"
 fi
-echo -e "RCL input data are in files:"
-for rcl in "${rcl_input_files[@]}"; do
-	echo -e "\t$rcl"
-done
-echo -e "Candidate regions are in file:\n\t$candidate_regions_file"
 
 ### STAGE 10: clean up temporary files
 if [ $save -eq 0 ]; then
@@ -726,4 +719,14 @@ if [ $save -eq 0 ]; then
 	rm "$outdir"/$ref_prefix*/"$prefix"*-bga.bedGraph
 	rm "$outdir"/$ref_prefix*/"$prefix"*-regions[1234].txt
 	set +x
+fi
+
+echo -e "RCL input data are in files:"
+for rcl in "${rcl_input_files[@]}"; do
+	echo -e "\t$rcl"
+done
+echo -e "Candidate regions are in file:\n\t$candidate_regions_file"
+
+if [[ "$nindivBam" =~ ".*\.srt\.bam" ]]; then
+	echo "[WARNING] We wrote sorted BAM files \"$nindivBam\". You should use these files instead of \"$indivBam\" in future runs of this script."
 fi
