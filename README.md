@@ -194,16 +194,17 @@ Identification of good candidate regions is an important part to the success of 
 Here are the files you need to provide.
 All the following files should be in the current directory or a <i>data directory</i> provided by command-line option `-d`.
 1. **A <i>chromosome file</i> (default: `chrList.txt`)**:
-Thie file contains the names of the reference sequences (chromosomes) where you would like to call peaks.
+This file contains the names of the reference sequences (chromosomes) where you would like to call peaks.
 The names in this file should match the first column of all bed files mentioned below.
 You can change the name of this file with the command option `-c`, and the file should be found in the <i>data directory</i>.
-1. **Coverage files**:
+1. **Bedgraph <i>coverage files</i>**:
 You must provide a [bed](https://genome.ucsc.edu/FAQ/FAQformat.html#format1)-formatted (5-column) bedgraph file for each of the replicates and each of the reference sequences (chromosomes) where you want to call peaks.
-Each replicate file contains the coverage for the same fixed-length segments chosen for input to RCL.
-Specifically, the coverage for replicate REP on reference sequence SEQ is expected in file DIR/chrSEQ/REP.covBga.txt.
+Each replicate file contains the read coverage for the same fixed-length segments chosen for input to RCL.
+Specifically, the coverage for replicate REP on reference sequence SEQ is expected in file `DIR/chrSEQ/REP.covBga.txt`.
 REP is the basename (without .bam extension) of an [input](#input) BAM file, provided via option `-b` to `run_rcl.sh`.
 SEQ is a reference sequence (chromosome) name, provided in the <i>chromosome file</i>.
 DIR is the <i>data directory</i>.
+The extension `covBga.txt` can be changed with command line option `-x`.
 1. **Candidate region file**:
 You must provide a [bed](https://genome.ucsc.edu/FAQ/FAQformat.html#format1)-formatted (4-column) file containing the candidate peak regions that RCL will score. 
 The fixed-length regions are extracted from these candidate regions by our (preprocessing script)[#preprocessing], Stage 5.
