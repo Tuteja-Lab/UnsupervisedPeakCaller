@@ -207,7 +207,7 @@ DIR is the <i>data directory</i>.
 The extension `covBga.txt` can be changed with command line option `-x`.
 1. **Candidate region file**:
 You must provide a [bed](https://genome.ucsc.edu/FAQ/FAQformat.html#format1)-formatted (4-column) file containing the candidate peak regions that RCL will score. 
-The fixed-length regions are extracted from these candidate regions by our (preprocessing script)[#preprocessing], Stage 5.
+The fixed-length regions are extracted from these candidate regions by our [preprocessing script](#preprocessing), Stage 5.
 This file is expected to be called `bigInputs.txt` in the <i>data directory</i>, but you can override the filename using option `-i`.
 
 ## Example: Tutorial Step 3 <a name = "peakcalling_example" />
