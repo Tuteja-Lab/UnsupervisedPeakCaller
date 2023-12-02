@@ -139,8 +139,8 @@ if __name__ == "__main__":
         dat.append(read_data_new(file))
         dataf.append(make_region(file))
     if args.debug:
-        print("Coverage, data set 1:", dat[0])
-        print("Regions:", dataf[0])
+        print("Coverage (", len(dat), "), data set 1 (", dat[0].shape, "):", dat[0])
+        print("Regions (", len(dataf), "), data set 1 (", dataf[0].shape, "):", dataf[0])
 
     # count nucleotides covering each segment in each replicate
     alllab2 = []
@@ -153,10 +153,14 @@ if __name__ == "__main__":
 
     rep_class = []
     for d in dat:
+        if args.debug:
+            print("Classifying data set: ", d.shape)
         rep_class.append(get_conemb(d, classification))
+        if args.debug:
+            print("Adding to rep_class: ", rep_class[-1].shape)
 
     if args.debug:
-        print("rep_class: ", rep_class[0])
+        print("rep_class (", len(rep_class), "), data set 1 (", rep_class[0].shape, "): ", rep_class[0])
 
     # choose peak as class 0 or 1 based on which one has higher coverage
     #final_lab = compute_m(rep_class, alllab2, args.debug)
@@ -172,14 +176,20 @@ if __name__ == "__main__":
     dicts = []
     i = 1
     for p, o in zip(rep_class, dataf):
+        if args.debug:
+            print("p (", p.shape, ")")
         p = p.squeeze(1).detach().cpu().numpy()
         if args.debug:
-            print("y_scores:", p[:, 0])
+            print("p, reshaped (", p.shape, "):", p[:, 0])
         # decide which RCL label is peak based on correlation with "truth" labels
         y_scores = p[:, 0]
+        if args.debug:
+            print("y_scores[:0] (", y_scores.shape, "):", y_scores)
         precision, recall, thresholds = precision_recall_curve(y_true, y_scores)
         auc1 = auc(recall, precision)
         y_scores = p[:, 1]
+        if args.debug:
+            print("y_scores[:1] (", y_scores.shape, "):", y_scores)
         precision2, recall2, thresholds = precision_recall_curve(y_true, y_scores)
         auc2 = auc(recall2, precision2)
         if auc2 > auc1:
@@ -190,6 +200,8 @@ if __name__ == "__main__":
             if args.debug:
                print("Taking label 1: auc=", auc1)
             y_scores = p[:, 0]
+        if args.debug:
+            print("y_scores (", y_scores.shape, "):", y_scores)
 
         d = {'chr': str(args.id), 'score': y_scores}
         
@@ -197,7 +209,7 @@ if __name__ == "__main__":
         df = pd.concat([df, o], axis=1)[["chr", "s", "e", "name", "score"]]
         df = df.rename(columns={'score' : 'score' + str(i)})
         if args.debug:
-            print(df)
+            print(df.shape, df)
         dicts.append(df)
         i += 1
         
