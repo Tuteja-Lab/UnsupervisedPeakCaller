@@ -178,8 +178,6 @@ The final output of the preprocessing consists of two types of [Bed](https://gen
 This file is written to `bigInputs.txt` in your data directory passed to `preprocessing.bash` via command option `-d`.
 1. File `chrList.txt` with the names of the reference sequences (chromosomes) where you would like to call peaks. The names should match the first column of `bigInputs.txt`. The file is written to the data directory passed to `preprocessing.bash` via command option `-d`.
 
-You are welcome to provide equivalent input using your own data preprocessing methods.
-
 ## Preprocessing Cleanup <a name = "preprocessing_cleanup" />
 
 Data preprocessing produces many large intermediate files.
@@ -188,12 +186,10 @@ However, if you use the save option (```-s``` option) all these intermediate fil
 To delete these files, carefully use the following command: ```rm example/test* example/chr*/test*```, to clean up a previous preprocessing run with options ```-d example -n test```.
 
 # Peak Calling <a name = "peakcalling" />
-We provide a [bash](https://www.gnu.org/software/bash/) script ```run_rcl.sh``` that fits RCL and assigns predictive peaks scores to each of the candidate regions prepared by [Preprocessing](#preprocessing).
+We provide a [bash](https://www.gnu.org/software/bash/) script ```run_rcl.sh``` that fits RCL and assigns predictive peaks scores to each of the candidate regions prepared by the [preprocessing step](#preprocessing) or your own preprocessing pipeline.
 
 ## Peak Calling Input <a name = "rcl_input" />
-The input to peak calling is the [output](#preprocessing_input) of [Preprocessing](#preprocessing).
-
-It is not necessary to use the provided preprocessing script if you want to prepare input in some other way.
+The easiest way to get input for RCL peak calling is to use the [preprocessing](#preprocessing) step, but you can prepare input in some other way.
 Identification of good candidate regions is an important part to the success of RCL.
 Here are the files you need to provide.
 All the following files should be in the current directory or a <i>data directory</i> provided by command-line option `-d`.
