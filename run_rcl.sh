@@ -14,6 +14,8 @@ ref_prefix="chr"
 save=0
 overwrite=0
 debug=""
+candidate_bed="bigInputs.txt"
+chr_list="chrList.txt"
 
 helpFunction()
 {
@@ -22,10 +24,12 @@ helpFunction()
 	echo -e "\t-b STR list of preprocessed replicate BAM files, surrounded by double quotes."
 	echo -e "\t       BAM files should have alread been preprocessed by preprocessing.bash."
 	echo -e "\t       Example (from tutorial): \"MCF7_chr10_rep1.bam MCF7_chr10_rep2.bam\""
+	echo -e "\t-c STR File with reference sequences (chromosomes), one per line, on which to call peaks (DEFAULT: $chr_list)."
 	echo -e "\t-d STR path to Data files (DEFAULT: $path)."
 	echo -e "\t-e INT number of Epochs (DEFAULT: $epoch)."
 	echo -e "\t-g     turn on debuGging output (DEFAULT: no)."
 	echo -e "\t-h INT batcH size (DEFAULT: $batch)."
+	echo -e "\t-i STR BED file (4-column: chr start end name) containing input regions to score (DEFAULT: $candidate_bed)."
 	echo -e "\t-r STR Reference sequence name prefix (DEFAULT: $ref_prefix)."
 	echo -e "\t-s     Save output files (DEFAULT: no)."
 	echo -e "\t-w     overWrite existing files (DEFAULT: no)."
@@ -35,15 +39,17 @@ helpFunction()
 	exit 1 # Exit script after printing help
 }
 
-while getopts ?gswb:d:e:h:r:x: flag
+while getopts ?gswb:c:d:e:h:i:r:x: flag
 do
 	case "${flag}" in
 		b) fname=${OPTARG};;
+		c) chr_list=$OPTARG;;
 		d) path=${OPTARG};;
 		e) epoch=${OPTARG};;
 		g) debug=--debug;;
-		r) ref_prefix=${OPTARG};;
 		h) batch=${OPTARG};;
+		i) candidate_bed=$OPTARG;;
+		r) ref_prefix=${OPTARG};;
 		w) overwrite=1;;
 		s) save=1;;
 		x) ext=${OPTARG};;
@@ -75,7 +81,7 @@ do
 			[ "$chr" = "X" ] && continue
 			[ "$chr" = "Y" ] && continue
 			cat "$path"/$ref_prefix"$chr"/"$rep_name""$ext" >> "$path"/rep$nreps.txt
-		done < "$path"/chrList.txt
+		done < "$path"/"$chr_list"
 	fi
 done
 
@@ -89,8 +95,8 @@ fi
 
 if [ $overwrite -eq 1 -o ! -s "$path"/rcl.bed ]; then
 	while read chr; do
-		python rcl_score.py $debug --model "$path"/rcl.ckpt --dpath "$path"/$ref_prefix"$chr" --names $rep_names --preprocess_region "$path"/bigInputs.txt --id $chr --prefix "$path"
-	done < "$path"/chrList.txt
+		python rcl_score.py $debug --model "$path"/rcl.ckpt --dpath "$path"/$ref_prefix"$chr" --names $rep_names --preprocess_region "$path"/$candidate_bed --id $chr --prefix "$path"
+	done < "$path"/"$chr_list"
 	cat "$path"/rcl_*bed > "$path"/rcl.bed
 else
 	echo "Using existing \"$path/rcl.bed\" file"
